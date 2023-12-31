@@ -16,6 +16,8 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
+[project.urls]
+Source = "https://github.com/garulf/steam-client"
 
 [tool.setuptools]
 packages = ["steam_client"]
