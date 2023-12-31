@@ -9,17 +9,17 @@ on:
       - v*
 
 env:
-  python: 3.10
+  python: '3.10'
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python "${{ env.python }}"
+      - name: Set up Python ${{ env.python }}
         uses: actions/setup-python@v2
         with:
-          python-version: "${{ env.python }}"
+          python-version: ${{ env.python }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
