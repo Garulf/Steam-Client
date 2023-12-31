@@ -7,7 +7,7 @@ authors = [
     {name = "William McAllister", email = "dev.garulf@gmail.com"}
 ]
 version = '0.0.1-dev.1'
-description = "Python library to help build Flow Launcher plugins."
+description = "Steam client library for Python"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
@@ -16,12 +16,9 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
-dependencies = [
-    'typing_extensions>=4.8.0; python_version < "3.11"'
-]
 
 [tool.setuptools]
-packages = ["steam-client"]
+packages = ["steam_client"]
 
 [tool.bumpversion]
 current_version = "0.0.1-dev"
