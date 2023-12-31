@@ -9,7 +9,7 @@ on:
       - v*
 
 env:
-  python: 3.11
+  python: 3.10
 
 jobs:
   release:
