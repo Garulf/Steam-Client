@@ -38,7 +38,7 @@ class Steam:
         return Path(self.base_path).joinpath('appcache', 'librarycache')
 
     def get_users(self):
-        return self.login_users.users()
+        return LoginUsers(self).users()
 
     @property
     def library(self) -> Library:
