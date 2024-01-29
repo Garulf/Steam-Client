@@ -14,7 +14,6 @@ class Steam:
         self.base_path: str = base_path
         self.login_users = LoginUsers(self)
         self.commands = Commands()
-        self.library = Library(self)
 
     def __repr__(self) -> str:
         return f'Steam(base_path={self.base_path.__repr__()})'
@@ -41,3 +40,7 @@ class Steam:
 
     def get_users(self):
         return self.login_users.users()
+
+    @property
+    def library(self) -> Library:
+        return Library(self)
