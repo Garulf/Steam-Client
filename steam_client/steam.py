@@ -38,3 +38,6 @@ class Steam:
     def library_cache(self) -> Path:
         """Returns the path to the librarycache folder."""
         return Path(self.base_path).joinpath('appcache', 'librarycache')
+
+    def get_users(self):
+        return self.login_users.users()
