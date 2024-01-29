@@ -12,7 +12,6 @@ class Steam:
 
     def __init__(self, base_path: str = DEFAULT_WIN_STEAM_PATH):
         self.base_path: str = base_path
-        self.login_users = LoginUsers(self)
         self.commands = Commands()
 
     def __repr__(self) -> str:
