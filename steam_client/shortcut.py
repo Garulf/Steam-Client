@@ -54,17 +54,17 @@ class Shortcut(App):
         return str(int(self.appid) >> int(32))
 
     @property
-    def icon(self) -> str:
-        return self._data["icon"] or str(self._user.grid_path.joinpath(f"{self._short_id()}_icon.png"))
+    def icon(self) -> Path:
+        return Path(self._data["icon"]) or self._user.grid_path.joinpath(f"{self._short_id()}_icon.png")
 
     @property
-    def header(self) -> str:
-        return str(self._user.grid_path.joinpath(f"{self._short_id()}.png"))
+    def header(self) -> Path:
+        return self._user.grid_path.joinpath(f"{self._short_id()}.png")
 
     @property
-    def grid(self) -> str:
-        return str(self._user.grid_path.joinpath(f"{self._short_id()}p.png"))
+    def grid(self) -> Path:
+        return self._user.grid_path.joinpath(f"{self._short_id()}p.png")
 
     @property
-    def hero(self) -> str:
-        return str(self._user.grid_path.joinpath(f"{self._short_id()}_hero.png"))
+    def hero(self) -> Path:
+        return self._user.grid_path.joinpath(f"{self._short_id()}_hero.png")
