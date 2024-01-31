@@ -3,6 +3,9 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+
+from .commands import run_game_id
+
 if TYPE_CHECKING:
     from .steam import Steam
 
@@ -42,4 +45,4 @@ class App(ABC):
 
     def run(self):
         """Launches app with the specified app ID in the Steam client."""
-        self._steam.commands.run_game_id(self.appid)
+        self._steam.command(run_game_id(self.appid))
