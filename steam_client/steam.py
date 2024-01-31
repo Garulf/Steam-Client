@@ -1,4 +1,5 @@
 from pathlib import Path
+import webbrowser
 
 from .library import Library
 from .commands import Commands
@@ -44,3 +45,6 @@ class Steam:
     @property
     def library(self) -> Library:
         return Library(self)
+
+    def command(self, uri: str):
+        return webbrowser.open(uri)
