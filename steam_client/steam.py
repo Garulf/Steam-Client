@@ -2,7 +2,6 @@ from pathlib import Path
 import webbrowser
 
 from .library import Library
-from .commands import Commands
 from .login_users import LoginUsers
 
 DEFAULT_WIN_STEAM_PATH = r"c:\Program Files (x86)\Steam"
@@ -13,7 +12,6 @@ class Steam:
 
     def __init__(self, base_path: str = DEFAULT_WIN_STEAM_PATH):
         self.base_path: str = base_path
-        self.commands = Commands()
 
     def __repr__(self) -> str:
         return f'Steam(base_path={self.base_path.__repr__()})'

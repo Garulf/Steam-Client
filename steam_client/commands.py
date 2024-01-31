@@ -1,5 +1,4 @@
 from typing import Literal
-import webbrowser
 
 
 SteamWindow = Literal[
