@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict
 from typing import TypedDict
 
-import pycrc.algorithms as crc
+import pycrc.algorithms as crc  # type: ignore
 
 if TYPE_CHECKING:
     from .steam import Steam

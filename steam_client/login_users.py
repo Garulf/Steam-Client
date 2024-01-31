@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Optional
 from typing import TYPE_CHECKING
 
-import vdf
+import vdf  # type: ignore
 
 if TYPE_CHECKING:
     from steam_client.steam import Steam
