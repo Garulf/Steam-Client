@@ -27,6 +27,9 @@ Source = "https://github.com/garulf/steam-client"
 [tool.setuptools]
 packages = ["steam_client"]
 
+[tool.setuptools.package-data]
+"steam_client" = ["py.typed"]
+
 [tool.bumpversion]
 current_version = "1.0.0-dev.0"
 parse = """(?x)
