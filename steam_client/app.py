@@ -18,6 +18,12 @@ class App(ABC):
 
     @property
     @abstractmethod
+    def name(self) -> str:
+        """Returns the app's name."""
+        pass
+
+    @property
+    @abstractmethod
     def appid(self) -> str:
         """Returns the game's appid."""
         pass
