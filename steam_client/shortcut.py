@@ -7,7 +7,7 @@ import pycrc.algorithms as crc
 
 if TYPE_CHECKING:
     from .steam import Steam
-    from .login_users import User
+    from .login_users import LoginUser
 
 from .app import App
 
@@ -25,7 +25,7 @@ class ShortcutEntry(TypedDict):
 class Shortcut(App):
     """Represents a Non-Steam Game shortcut."""
 
-    def __init__(self, steam: Steam, user: User, data: ShortcutEntry):
+    def __init__(self, steam: Steam, user: LoginUser, data: ShortcutEntry):
         self._data = data
         self._user = user
         super().__init__(steam)

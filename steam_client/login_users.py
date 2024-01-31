@@ -1,9 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 from typing import TYPE_CHECKING
-from typing import TypedDict
 
 import vdf
 
@@ -15,7 +14,14 @@ from .shortcut import Shortcut
 STEAM64_OFFSET = 76561197960265728
 
 
-class UserData(TypedDict):
+@dataclass
+class User:
+    id: int
+    data: UserData
+
+
+@dataclass
+class UserData:
     AccountName: str
     PersonaName: str
     RememberPassword: str
@@ -26,29 +32,22 @@ class UserData(TypedDict):
     Timestamp: str
 
 
-UserLoginsFile = Dict[str, Dict[str, UserData]]
-
-
-class User:
+class LoginUser:
     """Represents a current or previous logged in Steam user."""
 
-    def __init__(self, steam: Steam, steam_id64: str, user_data: UserData):
+    def __init__(self, steam: Steam, user: User):
         self._steam = steam
-        self.steam_id64 = steam_id64
-        self._user_data = user_data
-
-    def __repr__(self) -> str:
-        return f'User(steam={self._steam.__repr__()}, steam_id64={self.steam_id64.__repr__()}, user_data={self._user_data.__repr__()})'
+        self.user = user
 
     @property
     def is_most_recent(self) -> bool:
         """Returns whether the user is the most recent user."""
-        return self._user_data['MostRecent'] == '1'
+        return self.user.data.MostRecent == '1'
 
     @property
     def steam_id3(self) -> int:
         """Returns the last portion of the user's SteamID3."""
-        steamidacct = (int(self.steam_id64) - STEAM64_OFFSET)
+        steamidacct = (int(self.user.id) - STEAM64_OFFSET)
         return steamidacct
 
     @property
@@ -89,12 +88,12 @@ class LoginUsers:
         """Returns the path to the loginusers.vdf file."""
         return Path(self._steam.base_path).joinpath('config', 'loginusers.vdf')
 
-    def users(self) -> List[User]:
+    def users(self) -> List[LoginUser]:
         """Returns the users from the loginusers.vdf file."""
         with open(self._path, 'r', encoding='utf-8', errors='ignore') as f:
-            login_users: UserLoginsFile = vdf.load(f)
-        return [User(self._steam, steam_id64, user_data) for steam_id64, user_data in login_users['users'].items()]
+            login_users = vdf.load(f)
+        return [LoginUser(self._steam, User(int(user_id), user_data)) for user_id, user_data in login_users['users'].items()]
 
-    def most_recent_user(self) -> Optional[User]:
+    def most_recent_user(self) -> Optional[LoginUser]:
         """Returns the most recent user from the loginusers.vdf file."""
         return next((user for user in self.users() if user.is_most_recent), None)
