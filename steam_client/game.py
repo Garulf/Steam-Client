@@ -42,7 +42,7 @@ class SteamGame(App):
     def icon(self) -> Path:
         """Returns the path to the icon image."""
         for asset in self.asset_dir.iterdir():
-            if asset not in ASSETS:
+            if asset.name not in ASSETS:
                 return asset
         return Path(self._steam.library_cache).joinpath(f'{self.appid}_icon.jpg')
 
