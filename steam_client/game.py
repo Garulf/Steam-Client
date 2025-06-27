@@ -13,6 +13,14 @@ from .app import App
 
 UNKNOWN_GAME_NAME = 'UNKNOWN'
 
+ASSETS = [
+    "header.jpg",
+    "library_600x900.jpg",
+    "library_hero.jpg",
+    "library_hero_blur.jpg",
+    "logo.png"
+]
+
 
 class SteamGame(App):
     """Represents a Steam game."""
@@ -26,8 +34,16 @@ class SteamGame(App):
         return f'Game(steam={self._steam.__repr__()}, library_path={self.library_path.__repr__()}, appid={self.appid.__repr__()})'
 
     @property
+    def asset_dir(self) -> Path:
+        """Returns the path to the game's asset directory."""
+        return Path(self._steam.library_cache).joinpath(self.appid)
+
+    @property
     def icon(self) -> Path:
         """Returns the path to the icon image."""
+        for asset in self.asset_dir.iterdir():
+            if asset not in ASSETS:
+                return asset
         return Path(self._steam.library_cache).joinpath(f'{self.appid}_icon.jpg')
 
     @property
