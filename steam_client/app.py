@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 
-from .commands import run_game_id
+from .commands import Commands 
 
 if TYPE_CHECKING:
     from .steam import Steam
@@ -15,6 +15,7 @@ class App(ABC):
 
     def __init__(self, steam: Steam):
         self._steam = steam
+        self._commands = Commands()
 
     @property
     @abstractmethod
@@ -51,4 +52,4 @@ class App(ABC):
 
     def run(self):
         """Launches app with the specified app ID in the Steam client."""
-        self._steam.command(run_game_id(self.appid))
+        self._commands.run_game_id(self.appid)
