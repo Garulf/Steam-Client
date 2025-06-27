@@ -4,13 +4,14 @@ import webbrowser
 from .library import Library
 from .login_users import LoginUsers
 
-DEFAULT_WIN_STEAM_PATH = r"c:\Program Files (x86)\Steam"
+WIN_STEAM_PATH = r"c:\Program Files (x86)\Steam"
+LINUX_STEAM_PATH = "~/.local/share/steam"
 
 
 class Steam:
     """Represents the Steam client."""
 
-    def __init__(self, base_path: str = DEFAULT_WIN_STEAM_PATH):
+    def __init__(self, base_path: str = WIN_STEAM_PATH):
         self.base_path: str = base_path
 
     def __repr__(self) -> str:
