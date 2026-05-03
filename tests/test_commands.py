@@ -1,5 +1,4 @@
 from unittest.mock import patch
-import pytest
 
 from steam_client.commands import Command, Commands, SteamWindows, SCHEME
 

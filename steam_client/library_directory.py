@@ -1,9 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, List
-from pathlib import Path
-
-import vdf
 
 if TYPE_CHECKING:
     from .steam import Steam

@@ -1,6 +1,4 @@
 import pytest
-from unittest.mock import MagicMock
-from dataclasses import dataclass
 
 from steam_client.steam import Steam
 from steam_client.login_users import LoginUser, User, UserData

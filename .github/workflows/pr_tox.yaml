@@ -1,0 +1,51 @@
+name: PR Tox
+
+on:
+  pull_request:
+
+jobs:
+  lint-and-type:
+    name: Lint and Type (3.11)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install tox
+        run: python -m pip install --upgrade pip tox
+
+      - name: Run tox lint and type
+        run: tox -e lint,type
+
+  tests:
+    name: Tests (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python-version: "3.11"
+            toxenv: py311
+          - python-version: "3.12"
+            toxenv: py312
+          - python-version: "3.13"
+            toxenv: py313
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install tox
+        run: python -m pip install --upgrade pip tox
+
+      - name: Run tox tests
+        run: tox -e ${{ matrix.toxenv }}
