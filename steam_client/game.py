@@ -13,13 +13,13 @@ from .app import App
 
 UNKNOWN_GAME_NAME = 'UNKNOWN'
 
-ASSETS = [
+ASSETS = frozenset({
     "header.jpg",
     "library_600x900.jpg",
     "library_hero.jpg",
     "library_hero_blur.jpg",
     "logo.png"
-]
+})
 
 
 class SteamGame(App):
@@ -28,6 +28,7 @@ class SteamGame(App):
     def __init__(self, steam: Steam, library_path: str, appid: str):
         self.library_path = library_path
         self._appid = appid
+        self._icon: Path | None = None
         super().__init__(steam)
 
     def __repr__(self) -> str:
@@ -43,12 +44,14 @@ class SteamGame(App):
         return Path(self._steam.library_cache).joinpath(self.appid)
 
     @property
-    def icon(self) -> Path:
+    def icon(self) -> Path | None:
         """Returns the path to the icon image."""
-        for asset in self.asset_dir.iterdir():
-            if asset.name not in ASSETS:
-                return asset
-        return Path(self._steam.library_cache).joinpath(f'{self.appid}_icon.jpg')
+        if self._icon is None:
+            self._icon = next(
+                (asset for asset in self.asset_dir.iterdir() if asset.name not in ASSETS),
+                None
+            )
+        return self._icon
 
     @property
     def header(self) -> Path:
@@ -100,8 +103,8 @@ class SteamGame(App):
 
     def open_store_page(self):
         """Opens the game's store page in the Steam client."""
-        self._steam.commands.store(self.appid)
+        self._commands.store(self.appid)
 
     def uninstall(self):
         """Uninstalls the game."""
-        self._steam.commands.uninstall(self.appid)
+        self._commands.uninstall(self.appid)
