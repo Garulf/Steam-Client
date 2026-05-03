@@ -1,9 +1,8 @@
 from __future__ import annotations
-from pathlib import Path
 import hashlib
 from typing import TYPE_CHECKING, List, Optional, Union
 
-import vdf
+import vdf  # type: ignore
 
 from steam_client.shortcut import Shortcut
 
@@ -70,7 +69,7 @@ class Library:
     def shortcuts(self) -> List[Shortcut]:
         """Returns the Non-Steam shortcuts from the Steam library."""
         shortcuts = []
-        for user in self._steam.login_users.users():
+        for user in self._steam.users:
             shortcuts.extend(user.shortcuts())
         return shortcuts
 

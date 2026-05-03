@@ -1,6 +1,5 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-import pytest
 
 from steam_client.login_users import LoginUser, LoginUsers, User, UserData, STEAM64_OFFSET
 

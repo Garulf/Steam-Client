@@ -3,7 +3,7 @@ import functools
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import vdf
+import vdf  # type: ignore
 
 if TYPE_CHECKING:
     from .steam import Steam
@@ -31,7 +31,11 @@ class SteamGame(App):
         super().__init__(steam)
 
     def __repr__(self) -> str:
-        return f'Game(steam={self._steam.__repr__()}, library_path={self.library_path.__repr__()}, appid={self.appid.__repr__()})'
+        return (
+            f'Game(steam={self._steam.__repr__()}, '
+            f'library_path={self.library_path.__repr__()}, '
+            f'appid={self.appid.__repr__()})'
+        )
 
     @property
     def asset_dir(self) -> Path:
