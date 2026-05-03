@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 
-from .commands import Commands 
+from .commands import Commands
 
 if TYPE_CHECKING:
     from .steam import Steam

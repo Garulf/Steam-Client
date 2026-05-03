@@ -29,6 +29,7 @@ class SteamGame(App):
         self.library_path = library_path
         self._appid = appid
         self._icon: Path | None = None
+        self._name: str | None = None
         super().__init__(steam)
 
     def __repr__(self) -> str:
@@ -88,9 +89,14 @@ class SteamGame(App):
         except FileNotFoundError:
             return {}
 
-    @functools.cached_property
+    @property
     def name(self) -> str:
         """Returns the name of the game."""
+        if self._name is None:
+            self._name = self._get_name_from_manifest()
+        return self._name
+
+    def _get_name_from_manifest(self) -> str:
         try:
             return self._manifest['AppState']['name']
         except KeyError:
