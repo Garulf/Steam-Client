@@ -31,7 +31,9 @@ packages = ["steam_client"]
 "steam_client" = ["py.typed"]
 
 [tool.bumpversion]
-current_version = "2.0.1-dev.0"
+current_version = "2.1.0-dev.0"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
 parse = """(?x)
     (?P<major>[0-9]+)
     \\.(?P<minor>[0-9]+)
@@ -45,8 +47,6 @@ serialize = [
     "{major}.{minor}.{patch}-{label}.{label_n}",
     "{major}.{minor}.{patch}",
 ]
-search = "version = '{current_version}'"
-replace = "version = '{new_version}'"
 tag = true
 allow_dirty = false
 commit = true
