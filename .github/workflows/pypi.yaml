@@ -1,8 +1,9 @@
 name: Release on PYPI
 
-on: 
+on:
   workflow_dispatch:
-  workflow_call: 
+  release:
+    types: [published, prereleased]
 
 env:
   DEFAULT_PYTHON: 3.11
