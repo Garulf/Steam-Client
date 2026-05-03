@@ -49,8 +49,12 @@ class SteamGame(App):
         """Returns the path to the icon image."""
         if self._icon is None:
             self._icon = next(
-                (asset for asset in self.asset_dir.iterdir() if asset.name not in ASSETS),
-                None
+                (
+                    asset
+                    for asset in self.asset_dir.iterdir()
+                    if asset.is_file() and asset.name not in ASSETS
+                ),
+                None,
             )
         return self._icon
 
