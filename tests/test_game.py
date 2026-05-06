@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import Mock, patch
 import pytest
 
 from steam_client.game import SteamGame, UNKNOWN_GAME_NAME
@@ -44,6 +45,46 @@ def test_hero(game):
 
 def test_hero_blur(game):
     assert game.hero_blur == Path("/fake/steam/appcache/librarycache") / f"{APPID}_library_hero_blur.jpg"
+
+
+def test_icon_returns_first_non_asset_file(game):
+    header = Mock(spec=Path)
+    header.name = "header.jpg"
+    header.is_file.return_value = True
+
+    icon = Mock(spec=Path)
+    icon.name = "icon_hash.ico"
+    icon.is_file.return_value = True
+
+    with patch.object(Path, "iterdir", return_value=[header, icon]):
+        assert game.icon == icon
+
+
+def test_icon_returns_none_when_no_valid_icon(game):
+    header = Mock(spec=Path)
+    header.name = "header.jpg"
+    header.is_file.return_value = True
+
+    logo = Mock(spec=Path)
+    logo.name = "logo.png"
+    logo.is_file.return_value = True
+
+    with patch.object(Path, "iterdir", return_value=[header, logo]):
+        assert game.icon is None
+
+
+def test_icon_is_cached(game):
+    icon = Mock(spec=Path)
+    icon.name = "icon_hash.ico"
+    icon.is_file.return_value = True
+
+    with patch.object(Path, "iterdir", return_value=[icon]) as mock_iterdir:
+        first_icon = game.icon
+        second_icon = game.icon
+
+    assert first_icon == icon
+    assert second_icon == icon
+    assert mock_iterdir.call_count == 1
 
 
 def test_game_name_from_manifest(game):
