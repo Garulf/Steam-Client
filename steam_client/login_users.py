@@ -74,7 +74,7 @@ class LoginUser:
         """Returns the data from the shortcuts.vdf file."""
         with open(self.shortcuts_file, 'rb') as f:
             shortcuts = vdf.binary_load(f)
-        return [Shortcut(self._steam, self, shortcuts['shortcuts'][shortcut_idx]) for shortcut_idx in shortcuts['shortcuts']]
+        return [Shortcut(self, shortcuts['shortcuts'][shortcut_idx]) for shortcut_idx in shortcuts['shortcuts']]
 
 
 class LoginUsers:

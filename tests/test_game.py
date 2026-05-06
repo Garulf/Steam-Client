@@ -6,11 +6,12 @@ from steam_client.game import SteamGame, UNKNOWN_GAME_NAME
 
 LIBRARY_PATH = "/library"
 APPID = "12345"
+LIBRARY_CACHE_PATH = Path("/fake/steam/appcache/librarycache")
 
 
 @pytest.fixture
-def game(steam):
-    return SteamGame(steam, LIBRARY_PATH, APPID)
+def game():
+    return SteamGame(LIBRARY_CACHE_PATH, LIBRARY_PATH, APPID)
 
 
 def test_game_appid(game):
@@ -28,23 +29,23 @@ def test_manifest_path(game):
 
 
 def test_asset_dir(game):
-    assert game.asset_dir == Path("/fake/steam/appcache/librarycache") / APPID
+    assert game.asset_dir == LIBRARY_CACHE_PATH / APPID
 
 
 def test_header(game):
-    assert game.header == Path("/fake/steam/appcache/librarycache") / f"{APPID}_header.jpg"
+    assert game.header == LIBRARY_CACHE_PATH / f"{APPID}_header.jpg"
 
 
 def test_grid(game):
-    assert game.grid == Path("/fake/steam/appcache/librarycache") / f"{APPID}_library_600x900.jpg"
+    assert game.grid == LIBRARY_CACHE_PATH / f"{APPID}_library_600x900.jpg"
 
 
 def test_hero(game):
-    assert game.hero == Path("/fake/steam/appcache/librarycache") / f"{APPID}_library_hero.jpg"
+    assert game.hero == LIBRARY_CACHE_PATH / f"{APPID}_library_hero.jpg"
 
 
 def test_hero_blur(game):
-    assert game.hero_blur == Path("/fake/steam/appcache/librarycache") / f"{APPID}_library_hero_blur.jpg"
+    assert game.hero_blur == LIBRARY_CACHE_PATH / f"{APPID}_library_hero_blur.jpg"
 
 
 def test_icon_returns_first_non_asset_file(game):

@@ -1,4 +1,5 @@
 from unittest.mock import Mock, patch, MagicMock, PropertyMock
+from pathlib import Path
 
 import pytest
 
@@ -192,7 +193,7 @@ class TestLibraryFolder:
     def test_library_folder_get_games_creates_steam_games(self, steam):
         """Verify that get_games() creates a list of SteamGame objects."""
         appids = ["440", "570", "730"]
-        folder = LibraryFolder(steam, "/library", appids)
+        folder = LibraryFolder(Path(steam.library_cache), "/library", appids)
 
         games = folder.get_games()
 
@@ -203,7 +204,7 @@ class TestLibraryFolder:
     def test_library_folder_get_games_preserves_order(self, steam):
         """Verify that get_games() preserves appid order."""
         appids = ["999", "111", "555"]
-        folder = LibraryFolder(steam, "/library", appids)
+        folder = LibraryFolder(Path(steam.library_cache), "/library", appids)
 
         games = folder.get_games()
         retrieved_appids = [game.appid for game in games]
@@ -212,7 +213,7 @@ class TestLibraryFolder:
 
     def test_library_folder_get_games_empty_list(self, steam):
         """Verify that get_games() handles empty app list."""
-        folder = LibraryFolder(steam, "/library", [])
+        folder = LibraryFolder(Path(steam.library_cache), "/library", [])
 
         games = folder.get_games()
 

@@ -35,7 +35,7 @@ class Library:
             libraries = vdf.load(f)
         # The is not always formatted the same way, so we grab the first key
         folder_key = list(libraries.keys())[0]
-        self._libraries = [LibraryFolder(self._steam, libraries[folder_key][item]["path"],
+        self._libraries = [LibraryFolder(self._steam.library_cache, libraries[folder_key][item]["path"],
                                          libraries[folder_key][item]["apps"]) for item in libraries[folder_key]]
 
     def libraries(self) -> Generator[LibraryFolder, None, None]:
