@@ -105,10 +105,10 @@ apps = api.get_app_list()
 
 ## Platform Notes
 
-| Platform | Default path | Registry helper |
-|----------|-------------|-----------------|
+| Platform | Default path                   | Registry helper         |
+|----------|--------------------------------|-------------------------|
 | Windows  | `C:\Program Files (x86)\Steam` | `steam_from_registry()` |
-| Linux    | `~/.local/share/steam` | Not available |
+| Linux    | `~/.local/share/steam`         | Not available           |
 
 Pass a custom path to override the default:
 
@@ -128,8 +128,3 @@ flake8 steam_client  # Lint
 mypy steam_client    # Type check
 tox             # Run all environments (lint, type, py311–314)
 ```
-
-## Support this project
-
-[![Buy Me a Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://www.buymeacoffee.com/garulf)
-[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/garulf)
