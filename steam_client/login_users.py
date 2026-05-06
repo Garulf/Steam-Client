@@ -88,7 +88,10 @@ class LoginUsers:
         """Returns the users from the loginusers.vdf file."""
         with open(self._path, 'r', encoding='utf-8', errors='ignore') as f:
             login_users = vdf.load(f)
-        return [LoginUser(str(self._base_path), User(int(user_id), user_data)) for user_id, user_data in login_users['users'].items()]
+        return [
+            LoginUser(str(self._base_path), User(int(user_id), user_data))
+            for user_id, user_data in login_users['users'].items()
+        ]
 
     def most_recent_user(self) -> Optional[LoginUser]:
         """Returns the most recent user from the loginusers.vdf file."""
