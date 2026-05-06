@@ -5,7 +5,7 @@ import pytest
 
 from steam_client.library import Library
 from steam_client.library_folder import LibraryFolder
-from steam_client.game import SteamGame
+from steam_client.game import Game
 
 
 @pytest.fixture
@@ -120,7 +120,7 @@ class TestLibrary:
                 with patch("hashlib.md5") as mock_md5:
                     mock_md5.return_value.hexdigest.return_value = "hash1"
                     with patch.object(
-                        SteamGame, "_get_name_from_manifest", return_value="Portal 2"
+                        Game, "_get_name_from_manifest", return_value="Portal 2"
                     ):
                         game1 = library.game_by_name("PORTAL 2")
                         game2 = library.game_by_name("portal 2")
@@ -138,7 +138,7 @@ class TestLibrary:
                 with patch("hashlib.md5") as mock_md5:
                     mock_md5.return_value.hexdigest.return_value = "hash1"
                     with patch.object(
-                        SteamGame, "_get_name_from_manifest", return_value="Portal 2"
+                        Game, "_get_name_from_manifest", return_value="Portal 2"
                     ):
                         game = library.game_by_name("Nonexistent Game")
 
@@ -182,7 +182,7 @@ class TestLibrary:
                         items = list(library.all())
 
         assert len(items) == 5
-        games = [item for item in items if isinstance(item, SteamGame)]
+        games = [item for item in items if isinstance(item, Game)]
         shortcuts = [item for item in items if item is mock_shortcut]
         assert len(games) == 4
         assert len(shortcuts) == 1
@@ -198,7 +198,7 @@ class TestLibraryFolder:
         games = folder.get_games()
 
         assert len(games) == 3
-        assert all(isinstance(game, SteamGame) for game in games)
+        assert all(isinstance(game, Game) for game in games)
         assert [game.appid for game in games] == appids
 
     def test_library_folder_get_games_preserves_order(self, steam):
