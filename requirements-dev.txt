@@ -8,6 +8,10 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.13.0
     # via httpx
+babel==2.18.0
+    # via mkdocs-material
+backrefs==7.0
+    # via mkdocs-material
 bracex==2.6
     # via wcmatch
 build==1.5.0
@@ -20,15 +24,21 @@ certifi==2026.4.22
     # via
     #   httpcore
     #   httpx
+    #   requests
+charset-normalizer==3.4.7
+    # via requests
 click==8.3.3
     # via
     #   bump-my-version
+    #   mkdocs
     #   pip-tools
     #   rich-click
 colorama==0.4.6
     # via
     #   build
     #   click
+    #   mkdocs
+    #   mkdocs-material
     #   pytest
     #   rich-click
     #   tox
@@ -45,6 +55,10 @@ flake8==7.3.0
     #   flake8-markdown
 flake8-markdown==0.6.0
     # via -r requirements-dev.in
+ghp-import==2.1.0
+    # via mkdocs
+griffelib==2.0.2
+    # via mkdocstrings-python
 h11==0.16.0
     # via httpcore
 httpcore==1.0.9
@@ -55,16 +69,61 @@ idna==3.13
     # via
     #   anyio
     #   httpx
+    #   requests
 iniconfig==2.3.0
     # via pytest
+jinja2==3.1.6
+    # via
+    #   mkdocs
+    #   mkdocs-material
+    #   mkdocstrings
 librt==0.10.0
     # via mypy
+markdown==3.10.2
+    # via
+    #   mkdocs
+    #   mkdocs-autorefs
+    #   mkdocs-material
+    #   mkdocstrings
+    #   pymdown-extensions
 markdown-it-py==4.0.0
     # via rich
+markupsafe==3.0.3
+    # via
+    #   jinja2
+    #   mkdocs
+    #   mkdocs-autorefs
+    #   mkdocstrings
 mccabe==0.7.0
     # via flake8
 mdurl==0.1.2
     # via markdown-it-py
+mergedeep==1.3.4
+    # via
+    #   mkdocs
+    #   mkdocs-get-deps
+mkdocs==1.6.1
+    # via
+    #   -r requirements-dev.in
+    #   mkdocs-autorefs
+    #   mkdocs-material
+    #   mkdocstrings
+mkdocs-autorefs==1.4.4
+    # via
+    #   mkdocstrings
+    #   mkdocstrings-python
+mkdocs-get-deps==0.2.2
+    # via mkdocs
+mkdocs-material==9.7.6
+    # via -r requirements-dev.in
+mkdocs-material-extensions==1.3.1
+    # via mkdocs-material
+mkdocstrings[python]==1.0.4
+    # via
+    #   -r requirements-dev.in
+    #   mkdocstrings-python
+mkdocstrings-python==2.0.3
+    # via mkdocstrings
 mypy==1.20.2
     # via -r requirements-dev.in
 mypy-extensions==1.1.0
@@ -72,16 +131,22 @@ mypy-extensions==1.1.0
 packaging==26.2
     # via
     #   build
+    #   mkdocs
     #   pyproject-api
     #   pytest
     #   tox
     #   wheel
+paginate==0.5.7
+    # via mkdocs-material
 pathspec==1.1.1
-    # via mypy
+    # via
+    #   mkdocs
+    #   mypy
 pip-tools==7.5.3
     # via -r requirements-dev.in
 platformdirs==4.9.6
     # via
+    #   mkdocs-get-deps
     #   python-discovery
     #   tox
     #   virtualenv
@@ -105,8 +170,13 @@ pyflakes==3.4.0
     # via flake8
 pygments==2.20.0
     # via
+    #   mkdocs-material
     #   pytest
     #   rich
+pymdown-extensions==10.21.2
+    # via
+    #   mkdocs-material
+    #   mkdocstrings
 pyproject-api==1.10.0
     # via tox
 pyproject-hooks==1.2.0
@@ -115,20 +185,34 @@ pyproject-hooks==1.2.0
     #   pip-tools
 pytest==9.0.3
     # via -r requirements-dev.in
+python-dateutil==2.9.0.post0
+    # via ghp-import
 python-discovery==1.3.0
     # via
     #   tox
     #   virtualenv
 python-dotenv==1.2.2
     # via pydantic-settings
+pyyaml==6.0.3
+    # via
+    #   mkdocs
+    #   mkdocs-get-deps
+    #   pymdown-extensions
+    #   pyyaml-env-tag
+pyyaml-env-tag==1.1
+    # via mkdocs
 questionary==2.1.1
     # via bump-my-version
+requests==2.33.1
+    # via mkdocs-material
 rich==15.0.0
     # via
     #   bump-my-version
     #   rich-click
 rich-click==1.9.7
     # via bump-my-version
+six==1.17.0
+    # via python-dateutil
 tomli-w==1.2.0
     # via tox
 tomlkit==0.14.0
@@ -145,8 +229,12 @@ typing-inspection==0.4.2
     # via
     #   pydantic
     #   pydantic-settings
+urllib3==2.6.3
+    # via requests
 virtualenv==21.3.1
     # via tox
+watchdog==6.0.0
+    # via mkdocs
 wcmatch==10.1
     # via bump-my-version
 wcwidth==0.7.0
