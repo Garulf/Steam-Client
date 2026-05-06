@@ -2,8 +2,12 @@
 
 A Python library for interacting with a locally installed Steam client — enumerate your game library/non-steam games, read game metadata and artwork paths, and send Steam URI commands.
 
+[![Docs](https://img.shields.io/badge/docs-mkdocs%20material-0A7BBB?style=flat&logo=materialformkdocs&logoColor=white)](docs/index.md)
+
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-garulf-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/garulf)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-garulf-FF5E5B?style=flat&logo=ko-fi&logoColor=white)](https://ko-fi.com/garulf)
+
+
 
 ---
 
