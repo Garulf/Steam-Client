@@ -1,6 +1,6 @@
 # Steam Client
 
-A Python library for interacting with a locally installed Steam client — enumerate your game library/non-steam games, read game metadata and artwork paths, send Steam URI commands, and query the Steam Web API.
+A Python library for interacting with a locally installed Steam client — enumerate your game library/non-steam games, read game metadata and artwork paths, and send Steam URI commands.
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-garulf-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/garulf)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-garulf-FF5E5B?style=flat&logo=ko-fi&logoColor=white)](https://ko-fi.com/garulf)
@@ -91,17 +91,6 @@ for user in steam.users:
 for shortcut in steam.library.shortcuts():
     print(shortcut.appname)
 ```
-
-### Steam Web API
-
-```python
-from steam_client.web_api import WebAPI
-
-api = WebAPI()
-apps = api.get_app_list()
-```
-
----
 
 ## Platform Notes
 
