@@ -7,8 +7,8 @@ from steam_client.shortcut import Shortcut
 
 
 @pytest.fixture
-def shortcut(steam, login_user, shortcut_entry):
-    return Shortcut(steam, login_user, shortcut_entry)
+def shortcut(login_user, shortcut_entry):
+    return Shortcut(login_user, shortcut_entry)
 
 
 def _compute_appid(exe: str, appname: str) -> str:

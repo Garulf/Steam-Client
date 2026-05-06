@@ -1,20 +1,14 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING
-
 
 from .commands import Commands
-
-if TYPE_CHECKING:
-    from .steam import Steam
 
 
 class App(ABC):
     """Abstract base class for all Steam apps."""
 
-    def __init__(self, steam: Steam):
-        self._steam = steam
+    def __init__(self):
         self._commands = Commands()
 
     @property

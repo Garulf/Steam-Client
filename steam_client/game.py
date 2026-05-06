@@ -1,12 +1,8 @@
 from __future__ import annotations
 import functools
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import vdf  # type: ignore
-
-if TYPE_CHECKING:
-    from .steam import Steam
 
 from .app import App
 
@@ -22,19 +18,20 @@ ASSETS = frozenset({
 })
 
 
-class SteamGame(App):
+class Game(App):
     """Represents a Steam game."""
 
-    def __init__(self, steam: Steam, library_path: str, appid: str):
+    def __init__(self, library_cache_path: Path, library_path: str, appid: str):
+        self._library_cache_path = Path(library_cache_path)
         self.library_path = library_path
         self._appid = appid
         self._icon: Path | None = None
         self._name: str | None = None
-        super().__init__(steam)
+        super().__init__()
 
     def __repr__(self) -> str:
         return (
-            f'Game(steam={self._steam.__repr__()}, '
+            f'Game(library_cache_path={self._library_cache_path.__repr__()}, '
             f'library_path={self.library_path.__repr__()}, '
             f'appid={self.appid.__repr__()})'
         )
@@ -42,7 +39,7 @@ class SteamGame(App):
     @property
     def asset_dir(self) -> Path:
         """Returns the path to the game's asset directory."""
-        return Path(self._steam.library_cache).joinpath(self.appid)
+        return self._library_cache_path.joinpath(self.appid)
 
     @property
     def icon(self) -> Path | None:
@@ -61,22 +58,22 @@ class SteamGame(App):
     @property
     def header(self) -> Path:
         """Returns the path to the header image."""
-        return Path(self._steam.library_cache).joinpath(f'{self.appid}_header.jpg')
+        return self._library_cache_path.joinpath(f'{self.appid}_header.jpg')
 
     @property
     def grid(self) -> Path:
         """Returns the path to the 600x900 grid image."""
-        return Path(self._steam.library_cache).joinpath(f'{self.appid}_library_600x900.jpg')
+        return self._library_cache_path.joinpath(f'{self.appid}_library_600x900.jpg')
 
     @property
     def hero(self) -> Path:
         """Returns the path to the hero image."""
-        return Path(self._steam.library_cache).joinpath(f'{self.appid}_library_hero.jpg')
+        return self._library_cache_path.joinpath(f'{self.appid}_library_hero.jpg')
 
     @property
     def hero_blur(self) -> Path:
         """Returns the path to the blurred hero image."""
-        return Path(self._steam.library_cache).joinpath(f'{self.appid}_library_hero_blur.jpg')
+        return self._library_cache_path.joinpath(f'{self.appid}_library_hero_blur.jpg')
 
     @property
     def manifest_path(self) -> Path:
@@ -114,6 +111,10 @@ class SteamGame(App):
     def open_store_page(self):
         """Opens the game's store page in the Steam client."""
         self._commands.store(self.appid)
+
+    def install(self):
+        """Installs the game."""
+        self._commands.install(self.appid)
 
     def uninstall(self):
         """Uninstalls the game."""

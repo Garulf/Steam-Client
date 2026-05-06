@@ -2,12 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
-from typing import TYPE_CHECKING
 
 import vdf  # type: ignore
-
-if TYPE_CHECKING:
-    from steam_client.steam import Steam
 
 from .shortcut import Shortcut
 
@@ -35,8 +31,8 @@ class UserData:
 class LoginUser:
     """Represents a current or previous logged in Steam user."""
 
-    def __init__(self, steam: Steam, user: User):
-        self._steam = steam
+    def __init__(self, base_path: str, user: User):
+        self._base_path = Path(base_path)
         self.user = user
 
     @property
@@ -53,7 +49,7 @@ class LoginUser:
     @property
     def user_data_dir(self) -> Path:
         """Returns the path to the userdata folder."""
-        return Path(self._steam.base_path).joinpath('userdata', str(self.steam_id3))
+        return self._base_path.joinpath('userdata', str(self.steam_id3))
 
     @property
     def config(self) -> Path:
@@ -74,25 +70,28 @@ class LoginUser:
         """Returns the data from the shortcuts.vdf file."""
         with open(self.shortcuts_file, 'rb') as f:
             shortcuts = vdf.binary_load(f)
-        return [Shortcut(self._steam, self, shortcuts['shortcuts'][shortcut_idx]) for shortcut_idx in shortcuts['shortcuts']]
+        return [Shortcut(self, shortcuts['shortcuts'][shortcut_idx]) for shortcut_idx in shortcuts['shortcuts']]
 
 
 class LoginUsers:
     """Represents the loginusers.vdf file."""
 
-    def __init__(self, steam: Steam):
-        self._steam = steam
+    def __init__(self, base_path: str):
+        self._base_path = Path(base_path)
 
     @property
     def _path(self) -> Path:
         """Returns the path to the loginusers.vdf file."""
-        return Path(self._steam.base_path).joinpath('config', 'loginusers.vdf')
+        return self._base_path.joinpath('config', 'loginusers.vdf')
 
     def users(self) -> List[LoginUser]:
         """Returns the users from the loginusers.vdf file."""
         with open(self._path, 'r', encoding='utf-8', errors='ignore') as f:
             login_users = vdf.load(f)
-        return [LoginUser(self._steam, User(int(user_id), user_data)) for user_id, user_data in login_users['users'].items()]
+        return [
+            LoginUser(str(self._base_path), User(int(user_id), user_data))
+            for user_id, user_data in login_users['users'].items()
+        ]
 
     def most_recent_user(self) -> Optional[LoginUser]:
         """Returns the most recent user from the loginusers.vdf file."""

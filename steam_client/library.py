@@ -1,6 +1,6 @@
 from __future__ import annotations
 import hashlib
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union, Generator
 
 import vdf  # type: ignore
 
@@ -8,8 +8,8 @@ from steam_client.shortcut import Shortcut
 
 if TYPE_CHECKING:
     from .steam import Steam
-from .library_directory import LibraryDirectory
-from .game import SteamGame
+from .library_folder import LibraryFolder
+from .game import Game
 
 
 class Library:
@@ -18,7 +18,7 @@ class Library:
     def __init__(self, steam: 'Steam'):
         self._steam = steam
         self._libraries_hash: Optional[str] = None
-        self._libraries: List[LibraryDirectory] = []
+        self._libraries: List[LibraryFolder] = []
 
     def _hash_steam_libraries(self) -> str:
         """Returns the MD5 hash of the Steam library folders file."""
@@ -35,44 +35,46 @@ class Library:
             libraries = vdf.load(f)
         # The is not always formatted the same way, so we grab the first key
         folder_key = list(libraries.keys())[0]
-        self._libraries = [LibraryDirectory(self._steam, libraries[folder_key][item]["path"],
-                                            libraries[folder_key][item]["apps"]) for item in libraries[folder_key]]
+        self._libraries = [LibraryFolder(self._steam.library_cache, libraries[folder_key][item]["path"],
+                                         libraries[folder_key][item]["apps"]) for item in libraries[folder_key]]
 
-    def libraries(self) -> List[LibraryDirectory]:
+    def libraries(self) -> Generator[LibraryFolder, None, None]:
         """Returns the Steam library folders."""
         if self._is_updated():
             self._libraries_hash = self._hash_steam_libraries()
             self._update_libraries()
-        return self._libraries
+        for library in self._libraries:
+            yield library
 
-    def games(self) -> List[SteamGame]:
+    def games(self) -> Generator[Game, None, None]:
         """Returns the games from the Steam library."""
-        games = []
         for library in self.libraries():
-            games.extend(library.get_games())
-        return games
+            for game in library.get_games():
+                yield game
 
-    def game_by_id(self, appid: str) -> Optional[SteamGame]:
+    def game_by_id(self, appid: str) -> Optional[Game]:
         """Returns the game with the specified ID."""
         for game in self.games():
             if game.appid == appid:
                 return game
         return None
 
-    def game_by_name(self, name: str) -> Optional[SteamGame]:
+    def game_by_name(self, name: str) -> Optional[Game]:
         """Returns the game with the specified name."""
         for game in self.games():
             if game.name.casefold() == name.casefold():
                 return game
         return None
 
-    def shortcuts(self) -> List[Shortcut]:
+    def shortcuts(self) -> Generator[Shortcut, None, None]:
         """Returns the Non-Steam shortcuts from the Steam library."""
-        shortcuts = []
         for user in self._steam.users:
-            shortcuts.extend(user.shortcuts())
-        return shortcuts
+            for shortcut in user.shortcuts():
+                yield shortcut
 
-    def all(self) -> List[Union[SteamGame, Shortcut]]:
+    def all(self) -> Generator[Union[Game, Shortcut], None, None]:
         """Returns all the games and shortcuts from the Steam library."""
-        return self.games() + self.shortcuts()
+        for game in self.games():
+            yield game
+        for shortcut in self.shortcuts():
+            yield shortcut

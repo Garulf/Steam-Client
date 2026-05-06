@@ -6,7 +6,6 @@ from typing import TypedDict
 import pycrc.algorithms as crc  # type: ignore
 
 if TYPE_CHECKING:
-    from .steam import Steam
     from .login_users import LoginUser
 
 from .app import App
@@ -25,13 +24,13 @@ class ShortcutEntry(TypedDict):
 class Shortcut(App):
     """Represents a Non-Steam Game shortcut."""
 
-    def __init__(self, steam: Steam, user: LoginUser, data: ShortcutEntry):
+    def __init__(self, user: LoginUser, data: ShortcutEntry):
         self._data = data
         self._user = user
-        super().__init__(steam)
+        super().__init__()
 
     def __repr__(self) -> str:
-        return f'Shortcut(steam={self._steam.__repr__()}, data={self._data.__repr__()})'
+        return f'Shortcut(data={self._data.__repr__()})'
 
     @property
     def name(self) -> str:

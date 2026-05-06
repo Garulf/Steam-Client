@@ -24,7 +24,7 @@ def test_login_user_not_most_recent(steam, user_data):
         Timestamp=user_data.Timestamp,
     )
     user = User(id=FAKE_USER_ID, data=data)
-    lu = LoginUser(steam, user)
+    lu = LoginUser(steam.base_path, user)
     assert lu.is_most_recent is False
 
 
@@ -82,10 +82,10 @@ def test_login_users_most_recent(steam, user_data):
         Timestamp="0",
     )
     not_recent_user = User(id=FAKE_USER_ID + 1, data=not_recent_data)
-    users = [LoginUser(steam, recent_user), LoginUser(steam, not_recent_user)]
+    users = [LoginUser(steam.base_path, recent_user), LoginUser(steam.base_path, not_recent_user)]
 
     with patch.object(LoginUsers, "users", return_value=users):
-        lu = LoginUsers(steam)
+        lu = LoginUsers(steam.base_path)
         most_recent = lu.most_recent_user()
 
     assert most_recent is not None
@@ -103,10 +103,10 @@ def test_login_users_most_recent_none_when_no_recent(steam, user_data):
         MostRecent="0",
         Timestamp="0",
     )
-    users = [LoginUser(steam, User(id=FAKE_USER_ID, data=data))]
+    users = [LoginUser(steam.base_path, User(id=FAKE_USER_ID, data=data))]
 
     with patch.object(LoginUsers, "users", return_value=users):
-        lu = LoginUsers(steam)
+        lu = LoginUsers(steam.base_path)
         most_recent = lu.most_recent_user()
 
     assert most_recent is None

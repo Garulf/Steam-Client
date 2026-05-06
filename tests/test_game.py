@@ -1,15 +1,17 @@
 from pathlib import Path
+from unittest.mock import Mock, patch
 import pytest
 
-from steam_client.game import SteamGame, UNKNOWN_GAME_NAME
+from steam_client.game import Game, UNKNOWN_GAME_NAME
 
 LIBRARY_PATH = "/library"
 APPID = "12345"
+LIBRARY_CACHE_PATH = Path("/fake/steam/appcache/librarycache")
 
 
 @pytest.fixture
-def game(steam):
-    return SteamGame(steam, LIBRARY_PATH, APPID)
+def game():
+    return Game(LIBRARY_CACHE_PATH, LIBRARY_PATH, APPID)
 
 
 def test_game_appid(game):
@@ -27,23 +29,63 @@ def test_manifest_path(game):
 
 
 def test_asset_dir(game):
-    assert game.asset_dir == Path("/fake/steam/appcache/librarycache") / APPID
+    assert game.asset_dir == LIBRARY_CACHE_PATH / APPID
 
 
 def test_header(game):
-    assert game.header == Path("/fake/steam/appcache/librarycache") / f"{APPID}_header.jpg"
+    assert game.header == LIBRARY_CACHE_PATH / f"{APPID}_header.jpg"
 
 
 def test_grid(game):
-    assert game.grid == Path("/fake/steam/appcache/librarycache") / f"{APPID}_library_600x900.jpg"
+    assert game.grid == LIBRARY_CACHE_PATH / f"{APPID}_library_600x900.jpg"
 
 
 def test_hero(game):
-    assert game.hero == Path("/fake/steam/appcache/librarycache") / f"{APPID}_library_hero.jpg"
+    assert game.hero == LIBRARY_CACHE_PATH / f"{APPID}_library_hero.jpg"
 
 
 def test_hero_blur(game):
-    assert game.hero_blur == Path("/fake/steam/appcache/librarycache") / f"{APPID}_library_hero_blur.jpg"
+    assert game.hero_blur == LIBRARY_CACHE_PATH / f"{APPID}_library_hero_blur.jpg"
+
+
+def test_icon_returns_first_non_asset_file(game):
+    header = Mock(spec=Path)
+    header.name = "header.jpg"
+    header.is_file.return_value = True
+
+    icon = Mock(spec=Path)
+    icon.name = "icon_hash.ico"
+    icon.is_file.return_value = True
+
+    with patch.object(Path, "iterdir", return_value=[header, icon]):
+        assert game.icon == icon
+
+
+def test_icon_returns_none_when_no_valid_icon(game):
+    header = Mock(spec=Path)
+    header.name = "header.jpg"
+    header.is_file.return_value = True
+
+    logo = Mock(spec=Path)
+    logo.name = "logo.png"
+    logo.is_file.return_value = True
+
+    with patch.object(Path, "iterdir", return_value=[header, logo]):
+        assert game.icon is None
+
+
+def test_icon_is_cached(game):
+    icon = Mock(spec=Path)
+    icon.name = "icon_hash.ico"
+    icon.is_file.return_value = True
+
+    with patch.object(Path, "iterdir", return_value=[icon]) as mock_iterdir:
+        first_icon = game.icon
+        second_icon = game.icon
+
+    assert first_icon == icon
+    assert second_icon == icon
+    assert mock_iterdir.call_count == 1
 
 
 def test_game_name_from_manifest(game):

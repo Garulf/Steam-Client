@@ -1,23 +1,23 @@
 from unittest.mock import patch
 
-from steam_client.commands import Command, Commands, SteamWindows, SCHEME
+from steam_client.commands import Command, Commands, SteamWindows
 
 
 class TestCommand:
     def setup_method(self):
-        self.command = Command(SCHEME)
+        self.command = Command()
 
     def test_create_uri_single_path(self):
-        uri = self.command._create_uri(["rungameid"], "12345")
+        uri = self.command._create_uri("rungameid", "12345")
         assert uri == "steam://rungameid/12345"
 
     def test_create_uri_multi_path(self):
-        uri = self.command._create_uri(["store", "app"], "67890")
+        uri = self.command._create_uri("store", "app", "67890")
         assert uri == "steam://store/app/67890"
 
     def test_call_opens_browser(self):
         with patch("webbrowser.open") as mock_open:
-            self.command(["rungameid"], "12345")
+            self.command.open("rungameid", "12345")
         mock_open.assert_called_once_with("steam://rungameid/12345")
 
 
