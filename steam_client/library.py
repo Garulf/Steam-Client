@@ -8,7 +8,7 @@ from steam_client.shortcut import Shortcut
 
 if TYPE_CHECKING:
     from .steam import Steam
-from .library_directory import LibraryDirectory
+from .library_folder import LibraryFolder
 from .game import SteamGame
 
 
@@ -18,7 +18,7 @@ class Library:
     def __init__(self, steam: 'Steam'):
         self._steam = steam
         self._libraries_hash: Optional[str] = None
-        self._libraries: List[LibraryDirectory] = []
+        self._libraries: List[LibraryFolder] = []
 
     def _hash_steam_libraries(self) -> str:
         """Returns the MD5 hash of the Steam library folders file."""
@@ -35,10 +35,10 @@ class Library:
             libraries = vdf.load(f)
         # The is not always formatted the same way, so we grab the first key
         folder_key = list(libraries.keys())[0]
-        self._libraries = [LibraryDirectory(self._steam, libraries[folder_key][item]["path"],
-                                            libraries[folder_key][item]["apps"]) for item in libraries[folder_key]]
+        self._libraries = [LibraryFolder(self._steam, libraries[folder_key][item]["path"],
+                                         libraries[folder_key][item]["apps"]) for item in libraries[folder_key]]
 
-    def libraries(self) -> Generator[LibraryDirectory, None, None]:
+    def libraries(self) -> Generator[LibraryFolder, None, None]:
         """Returns the Steam library folders."""
         if self._is_updated():
             self._libraries_hash = self._hash_steam_libraries()

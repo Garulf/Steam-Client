@@ -8,7 +8,7 @@ from .game import SteamGame
 
 
 @dataclass
-class LibraryDirectory:
+class LibraryFolder:
     """Represents a Steam library folder."""
     _steam: Steam
     path: str
