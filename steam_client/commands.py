@@ -22,15 +22,6 @@ class SteamWindows(StrEnum):
     CONSOLE = 'console'
 
 
-class Command():
-    def _create_uri(self, *segments: str) -> str:
-        return _create_uri(*segments)
-
-    def open(self, *segments: str) -> None:
-        """Executes the command with the specified endpoint."""
-        webbrowser.open(_create_uri(*segments))
-
-
 class Commands:
     """A collection of commands for the Steam client."""
 
