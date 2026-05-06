@@ -26,7 +26,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  docs:
+  build:
     name: Build docs
     runs-on: ubuntu-latest
     steps:
@@ -43,3 +43,27 @@ jobs:
 
       - name: Build docs in strict mode
         run: tox -e docs
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install docs dependencies
+        run: python -m pip install --upgrade pip -r requirements-docs.txt
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
