@@ -115,6 +115,10 @@ class SteamGame(App):
         """Opens the game's store page in the Steam client."""
         self._commands.store(self.appid)
 
+    def install(self):
+        """Installs the game."""
+        self._commands.install(self.appid)
+
     def uninstall(self):
         """Uninstalls the game."""
         self._commands.uninstall(self.appid)
