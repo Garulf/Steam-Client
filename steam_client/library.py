@@ -9,7 +9,7 @@ from steam_client.shortcut import Shortcut
 if TYPE_CHECKING:
     from .steam import Steam
 from .library_folder import LibraryFolder
-from .game import SteamGame
+from .game import Game
 
 
 class Library:
@@ -46,20 +46,20 @@ class Library:
         for library in self._libraries:
             yield library
 
-    def games(self) -> Generator[SteamGame, None, None]:
+    def games(self) -> Generator[Game, None, None]:
         """Returns the games from the Steam library."""
         for library in self.libraries():
             for game in library.get_games():
                 yield game
 
-    def game_by_id(self, appid: str) -> Optional[SteamGame]:
+    def game_by_id(self, appid: str) -> Optional[Game]:
         """Returns the game with the specified ID."""
         for game in self.games():
             if game.appid == appid:
                 return game
         return None
 
-    def game_by_name(self, name: str) -> Optional[SteamGame]:
+    def game_by_name(self, name: str) -> Optional[Game]:
         """Returns the game with the specified name."""
         for game in self.games():
             if game.name.casefold() == name.casefold():
@@ -72,7 +72,7 @@ class Library:
             for shortcut in user.shortcuts():
                 yield shortcut
 
-    def all(self) -> Generator[Union[SteamGame, Shortcut], None, None]:
+    def all(self) -> Generator[Union[Game, Shortcut], None, None]:
         """Returns all the games and shortcuts from the Steam library."""
         for game in self.games():
             yield game

@@ -18,7 +18,7 @@ ASSETS = frozenset({
 })
 
 
-class SteamGame(App):
+class Game(App):
     """Represents a Steam game."""
 
     def __init__(self, library_cache_path: Path, library_path: str, appid: str):

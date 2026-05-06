@@ -2,7 +2,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 import pytest
 
-from steam_client.game import SteamGame, UNKNOWN_GAME_NAME
+from steam_client.game import Game, UNKNOWN_GAME_NAME
 
 LIBRARY_PATH = "/library"
 APPID = "12345"
@@ -11,7 +11,7 @@ LIBRARY_CACHE_PATH = Path("/fake/steam/appcache/librarycache")
 
 @pytest.fixture
 def game():
-    return SteamGame(LIBRARY_CACHE_PATH, LIBRARY_PATH, APPID)
+    return Game(LIBRARY_CACHE_PATH, LIBRARY_PATH, APPID)
 
 
 def test_game_appid(game):
