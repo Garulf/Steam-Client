@@ -1,9 +1,7 @@
 from pathlib import Path
 import pytest
 
-import pycrc.algorithms as crc
-
-from steam_client.shortcut import Shortcut
+from steam_client.shortcut import CRC32_ALGORITHM, Shortcut
 
 
 @pytest.fixture
@@ -12,16 +10,8 @@ def shortcut(login_user, shortcut_entry):
 
 
 def _compute_appid(exe: str, appname: str) -> str:
-    algorithm = crc.Crc(
-        width=32,
-        poly=0x04C11DB7,
-        reflect_in=True,
-        xor_in=0xFFFFFFFF,
-        reflect_out=True,
-        xor_out=0xFFFFFFFF,
-    )
     input_string = exe + appname
-    top_32 = algorithm.bit_by_bit(input_string) | 0x80000000
+    top_32 = CRC32_ALGORITHM.bit_by_bit(input_string) | 0x80000000
     full_64 = (top_32 << 32) | 0x02000000
     return str(full_64)
 
