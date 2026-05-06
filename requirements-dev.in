@@ -5,6 +5,3 @@ pytest
 tox
 mypy
 bump-my-version
-mkdocs
-mkdocs-material
-mkdocstrings[python]
