@@ -3,7 +3,7 @@
 The API is organized into logical groups. Each page is generated directly from the source modules in this repository.
 
 | Module | Description |
-|--------|-------------|
+| ------ | ----------- |
 | [Steam](steam.md) | Main entry point — wraps a local Steam installation |
 | [Library](library.md) | Read installed games and non-Steam shortcuts |
 | [Games & Apps](games.md) | `Game`, `Shortcut`, and the shared `App` base class |
