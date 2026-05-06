@@ -120,4 +120,9 @@ mypy steam_client    # Type check
 mkdocs serve         # Preview docs locally
 mkdocs build --strict # Validate docs build
 tox             # Run all environments (lint, type, docs, py311–314)
+
+bump-my-version show current_version   # Show current version
+bump-my-version bump patch             # 4.0.0 → 4.0.1
+bump-my-version bump minor             # 4.0.0 → 4.1.0
+bump-my-version bump major             # 4.0.0 → 5.0.0
 ```
