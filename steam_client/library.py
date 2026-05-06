@@ -1,6 +1,6 @@
 from __future__ import annotations
 import hashlib
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union, Generator
 
 import vdf  # type: ignore
 
@@ -38,19 +38,19 @@ class Library:
         self._libraries = [LibraryDirectory(self._steam, libraries[folder_key][item]["path"],
                                             libraries[folder_key][item]["apps"]) for item in libraries[folder_key]]
 
-    def libraries(self) -> List[LibraryDirectory]:
+    def libraries(self) -> Generator[LibraryDirectory, None, None]:
         """Returns the Steam library folders."""
         if self._is_updated():
             self._libraries_hash = self._hash_steam_libraries()
             self._update_libraries()
-        return self._libraries
+        for library in self._libraries:
+            yield library
 
-    def games(self) -> List[SteamGame]:
+    def games(self) -> Generator[SteamGame, None, None]:
         """Returns the games from the Steam library."""
-        games = []
         for library in self.libraries():
-            games.extend(library.get_games())
-        return games
+            for game in library.get_games():
+                yield game
 
     def game_by_id(self, appid: str) -> Optional[SteamGame]:
         """Returns the game with the specified ID."""
@@ -66,13 +66,15 @@ class Library:
                 return game
         return None
 
-    def shortcuts(self) -> List[Shortcut]:
+    def shortcuts(self) -> Generator[Shortcut, None, None]:
         """Returns the Non-Steam shortcuts from the Steam library."""
-        shortcuts = []
         for user in self._steam.users:
-            shortcuts.extend(user.shortcuts())
-        return shortcuts
+            for shortcut in user.shortcuts():
+                yield shortcut
 
-    def all(self) -> List[Union[SteamGame, Shortcut]]:
+    def all(self) -> Generator[Union[SteamGame, Shortcut], None, None]:
         """Returns all the games and shortcuts from the Steam library."""
-        return self.games() + self.shortcuts()
+        for game in self.games():
+            yield game
+        for shortcut in self.shortcuts():
+            yield shortcut
