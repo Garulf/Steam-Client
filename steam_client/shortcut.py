@@ -54,7 +54,10 @@ class Shortcut(App):
 
     @property
     def icon(self) -> Path:
-        return Path(self._data["icon"]) or self._user.grid_path.joinpath(f"{self._short_id()}_icon.png")
+        icon_path = self._data["icon"]
+        if icon_path and Path(icon_path).is_file():
+            return Path(icon_path)
+        return self._user.grid_path.joinpath(f"{self._short_id()}_icon.png")
 
     @property
     def header(self) -> Path:
