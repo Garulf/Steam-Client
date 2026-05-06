@@ -115,5 +115,7 @@ Requires read access to local Steam config files (`libraryfolders.vdf`, `shortcu
 pytest          # Run tests
 flake8 steam_client  # Lint
 mypy steam_client    # Type check
-tox             # Run all environments (lint, type, py311–314)
+mkdocs serve         # Preview docs locally
+mkdocs build --strict # Validate docs build
+tox             # Run all environments (lint, type, docs, py311–314)
 ```
