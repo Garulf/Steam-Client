@@ -39,7 +39,7 @@ class Steam:
 
     @property
     def users(self):
-        return LoginUsers(self).users()
+        return LoginUsers(self.base_path).users()
 
     @property
     def library(self) -> Library:

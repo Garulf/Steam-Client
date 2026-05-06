@@ -34,7 +34,7 @@ def user(user_data):
 
 @pytest.fixture
 def login_user(steam, user):
-    return LoginUser(steam, user)
+    return LoginUser(steam.base_path, user)
 
 
 @pytest.fixture
