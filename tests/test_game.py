@@ -88,6 +88,11 @@ def test_icon_is_cached(game):
     assert mock_iterdir.call_count == 1
 
 
+def test_icon_returns_none_when_asset_directory_missing(game):
+    with patch.object(Path, "iterdir", side_effect=FileNotFoundError):
+        assert game.icon is None
+
+
 def test_game_name_from_manifest(game):
     game.__dict__["_manifest"] = {"AppState": {"name": "Portal 2"}}
     assert game.name == "Portal 2"

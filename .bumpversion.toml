@@ -1,0 +1,38 @@
+[tool.bumpversion]
+current_version = "4.0.0"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
+parse = """(?x)
+    (?P<major>[0-9]+)
+    \\.(?P<minor>[0-9]+)
+    \\.(?P<patch>[0-9]+)
+    (?:
+        -(?P<label>dev|rc|release)
+        (?:.(?P<label_n>[0-9]+))?
+    )?
+"""
+serialize = [
+    "{major}.{minor}.{patch}-{label}.{label_n}",
+    "{major}.{minor}.{patch}-{label}",
+    "{major}.{minor}.{patch}",
+]
+tag = true
+allow_dirty = false
+commit = true
+
+[tool.bumpversion.parts.label]
+independent = true
+optional_value = "release"
+values = [
+    "dev",
+    "rc",
+    "release",
+]
+
+[tool.bumpversion.parts.label_n]
+independent = true
+first_value = "0"
+optional_value = "0"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"

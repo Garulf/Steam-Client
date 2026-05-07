@@ -45,14 +45,17 @@ class Game(App):
     def icon(self) -> Path | None:
         """Returns the path to the icon image."""
         if self._icon is None:
-            self._icon = next(
-                (
-                    asset
-                    for asset in self.asset_dir.iterdir()
-                    if asset.is_file() and asset.name not in ASSETS
-                ),
-                None,
-            )
+            try:
+                self._icon = next(
+                    (
+                        asset
+                        for asset in self.asset_dir.iterdir()
+                        if asset.is_file() and asset.name not in ASSETS
+                    ),
+                    None,
+                )
+            except (FileNotFoundError, NotADirectoryError):
+                return None
         return self._icon
 
     @property

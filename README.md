@@ -1,6 +1,8 @@
 # Steam Client
 
-A Python library for interacting with a locally installed Steam client — enumerate your game library/non-steam games, read game metadata and artwork paths, send Steam URI commands, and query the Steam Web API.
+A Python library for interacting with a locally installed Steam client — enumerate your game library/non-steam games, read game metadata and artwork paths, and send Steam URI commands.
+
+[![Docs](https://img.shields.io/badge/docs-mkdocs%20material-0A7BBB?style=flat&logo=materialformkdocs&logoColor=white)](docs/index.md)
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-garulf-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/garulf)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-garulf-FF5E5B?style=flat&logo=ko-fi&logoColor=white)](https://ko-fi.com/garulf)
@@ -92,17 +94,6 @@ for shortcut in steam.library.shortcuts():
     print(shortcut.appname)
 ```
 
-### Steam Web API
-
-```python
-from steam_client.web_api import WebAPI
-
-api = WebAPI()
-apps = api.get_app_list()
-```
-
----
-
 ## Platform Notes
 
 | Platform | Default path                   | Registry helper         |
@@ -126,5 +117,12 @@ Requires read access to local Steam config files (`libraryfolders.vdf`, `shortcu
 pytest          # Run tests
 flake8 steam_client  # Lint
 mypy steam_client    # Type check
-tox             # Run all environments (lint, type, py311–314)
+mkdocs serve         # Preview docs locally
+mkdocs build --strict # Validate docs build
+tox             # Run all environments (lint, type, docs, py311–314)
+
+bump-my-version show current_version   # Show current version
+bump-my-version bump patch             # 4.0.0 → 4.0.1
+bump-my-version bump minor             # 4.0.0 → 4.1.0
+bump-my-version bump major             # 4.0.0 → 5.0.0
 ```

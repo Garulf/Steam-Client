@@ -1,9 +1,7 @@
 from pathlib import Path
 import pytest
 
-import pycrc.algorithms as crc
-
-from steam_client.shortcut import Shortcut
+from steam_client.shortcut import CRC32_ALGORITHM, Shortcut
 
 
 @pytest.fixture
@@ -12,16 +10,8 @@ def shortcut(login_user, shortcut_entry):
 
 
 def _compute_appid(exe: str, appname: str) -> str:
-    algorithm = crc.Crc(
-        width=32,
-        poly=0x04C11DB7,
-        reflect_in=True,
-        xor_in=0xFFFFFFFF,
-        reflect_out=True,
-        xor_out=0xFFFFFFFF,
-    )
     input_string = exe + appname
-    top_32 = algorithm.bit_by_bit(input_string) | 0x80000000
+    top_32 = CRC32_ALGORITHM.bit_by_bit(input_string) | 0x80000000
     full_64 = (top_32 << 32) | 0x02000000
     return str(full_64)
 
@@ -45,7 +35,16 @@ def test_shortcut_short_id(shortcut):
 
 
 def test_shortcut_icon_uses_data_icon(shortcut, shortcut_entry):
-    assert shortcut.icon == Path(shortcut_entry["icon"])
+    with pytest.MonkeyPatch.context() as m:
+        m.setattr(Path, "is_file", lambda *_: True)
+        assert shortcut.icon == Path(shortcut_entry["icon"])
+
+
+def test_shortcut_icon_falls_back_to_grid_icon_when_data_icon_missing(shortcut, login_user):
+    with pytest.MonkeyPatch.context() as m:
+        m.setattr(Path, "is_file", lambda *_: False)
+        short_id = shortcut._short_id()
+        assert shortcut.icon == login_user.grid_path / f"{short_id}_icon.png"
 
 
 def test_shortcut_header(shortcut, login_user):
