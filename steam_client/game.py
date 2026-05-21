@@ -9,12 +9,18 @@ from .app import App
 
 UNKNOWN_GAME_NAME = 'UNKNOWN'
 
+HEADER = 'header.jpg'
+LIBRARY_600X900 = 'library_600x900.jpg'
+LIBRARY_HERO = 'library_hero.jpg'
+LIBRARY_HERO_BLUR = 'library_hero_blur.jpg'
+LOGO = 'logo.png'
+
 ASSETS = frozenset({
-    "header.jpg",
-    "library_600x900.jpg",
-    "library_hero.jpg",
-    "library_hero_blur.jpg",
-    "logo.png"
+    HEADER,
+    LIBRARY_600X900,
+    LIBRARY_HERO,
+    LIBRARY_HERO_BLUR,
+    LOGO
 })
 
 
@@ -61,22 +67,22 @@ class Game(App):
     @property
     def header(self) -> Path:
         """Returns the path to the header image."""
-        return self._library_cache_path.joinpath(f'{self.appid}_header.jpg')
+        return self._library_cache_path.joinpath(HEADER)
 
     @property
     def grid(self) -> Path:
         """Returns the path to the 600x900 grid image."""
-        return self._library_cache_path.joinpath(f'{self.appid}_library_600x900.jpg')
+        return self._library_cache_path.joinpath(LIBRARY_600X900)
 
     @property
     def hero(self) -> Path:
         """Returns the path to the hero image."""
-        return self._library_cache_path.joinpath(f'{self.appid}_library_hero.jpg')
+        return self._library_cache_path.joinpath(LIBRARY_HERO)
 
     @property
     def hero_blur(self) -> Path:
         """Returns the path to the blurred hero image."""
-        return self._library_cache_path.joinpath(f'{self.appid}_library_hero_blur.jpg')
+        return self._library_cache_path.joinpath(LIBRARY_HERO_BLUR)
 
     @property
     def manifest_path(self) -> Path:
