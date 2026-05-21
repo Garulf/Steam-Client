@@ -67,22 +67,22 @@ class Game(App):
     @property
     def header(self) -> Path:
         """Returns the path to the header image."""
-        return self._library_cache_path.joinpath(HEADER)
+        return self.asset_dir.joinpath(HEADER)
 
     @property
     def grid(self) -> Path:
         """Returns the path to the 600x900 grid image."""
-        return self._library_cache_path.joinpath(LIBRARY_600X900)
+        return self.asset_dir.joinpath(LIBRARY_600X900)
 
     @property
     def hero(self) -> Path:
         """Returns the path to the hero image."""
-        return self._library_cache_path.joinpath(LIBRARY_HERO)
+        return self.asset_dir.joinpath(LIBRARY_HERO)
 
     @property
     def hero_blur(self) -> Path:
         """Returns the path to the blurred hero image."""
-        return self._library_cache_path.joinpath(LIBRARY_HERO_BLUR)
+        return self.asset_dir.joinpath(LIBRARY_HERO_BLUR)
 
     @property
     def manifest_path(self) -> Path:

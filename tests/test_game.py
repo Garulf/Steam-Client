@@ -33,19 +33,19 @@ def test_asset_dir(game):
 
 
 def test_header(game):
-    assert game.header == LIBRARY_CACHE_PATH / HEADER
+    assert game.header == LIBRARY_CACHE_PATH / APPID / HEADER
 
 
 def test_grid(game):
-    assert game.grid == LIBRARY_CACHE_PATH / LIBRARY_600X900
+    assert game.grid == LIBRARY_CACHE_PATH / APPID / LIBRARY_600X900
 
 
 def test_hero(game):
-    assert game.hero == LIBRARY_CACHE_PATH / LIBRARY_HERO
+    assert game.hero == LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO
 
 
 def test_hero_blur(game):
-    assert game.hero_blur == LIBRARY_CACHE_PATH / LIBRARY_HERO_BLUR
+    assert game.hero_blur == LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO_BLUR
 
 
 def test_icon_returns_first_non_asset_file(game):
