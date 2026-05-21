@@ -2,7 +2,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 import pytest
 
-from steam_client.game import Game, UNKNOWN_GAME_NAME
+from steam_client.game import Game, UNKNOWN_GAME_NAME, HEADER, LIBRARY_600X900, LIBRARY_HERO, LIBRARY_HERO_BLUR, LOGO
 
 LIBRARY_PATH = "/library"
 APPID = "12345"
@@ -33,19 +33,19 @@ def test_asset_dir(game):
 
 
 def test_header(game):
-    assert game.header == LIBRARY_CACHE_PATH / f"{APPID}_header.jpg"
+    assert game.header == LIBRARY_CACHE_PATH / HEADER
 
 
 def test_grid(game):
-    assert game.grid == LIBRARY_CACHE_PATH / f"{APPID}_library_600x900.jpg"
+    assert game.grid == LIBRARY_CACHE_PATH / LIBRARY_600X900
 
 
 def test_hero(game):
-    assert game.hero == LIBRARY_CACHE_PATH / f"{APPID}_library_hero.jpg"
+    assert game.hero == LIBRARY_CACHE_PATH / LIBRARY_HERO
 
 
 def test_hero_blur(game):
-    assert game.hero_blur == LIBRARY_CACHE_PATH / f"{APPID}_library_hero_blur.jpg"
+    assert game.hero_blur == LIBRARY_CACHE_PATH / LIBRARY_HERO_BLUR
 
 
 def test_icon_returns_first_non_asset_file(game):
