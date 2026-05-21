@@ -35,4 +35,6 @@ first_value = "0"
 optional_value = "0"
 
 [[tool.bumpversion.files]]
-filename = "pyproject.toml"
+filename = ".bumpversion.toml"
+search = "current_version = \"{current_version}\""
+replace = "current_version = \"{new_version}\""
