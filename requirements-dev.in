@@ -4,4 +4,3 @@ flake8-markdown
 pytest
 tox
 mypy
-bump-my-version
