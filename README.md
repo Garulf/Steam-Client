@@ -11,7 +11,7 @@ A Python library for interacting with a locally installed Steam client — enume
 
 ## Installation
 
-Requires Python 3.8+.
+Requires Python 3.11+.
 
 ```bash
 pip install steam-client
@@ -67,18 +67,18 @@ game.icon     # Path to icon file, or None
 ### Launch and manage games via Steam URI commands
 
 ```python
-from steam_client.commands import Commands, SteamWindows
+from steam_client import commands
+from steam_client.commands import SteamWindow
 
-commands = Commands()
-commands.run_game_id("440")         # Launch a game
-commands.store("440")               # Open store page
-commands.install("440")             # Prompt install
-commands.uninstall("440")           # Prompt uninstall
-commands.open(SteamWindows.FRIENDS) # Open a Steam window
+commands.run_game_id("440")               # Launch a game
+commands.store("440")                     # Open store page
+commands.install("440")                   # Prompt install
+commands.uninstall("440")                 # Prompt uninstall
+commands.open_window(SteamWindow.FRIENDS) # Open a Steam window
 commands.open_url("https://store.steampowered.com")
 ```
 
-Or launch a game directly from a `SteamGame` object:
+Or launch a game directly from a `Game` object:
 
 ```python
 game.run()
@@ -91,15 +91,17 @@ for user in steam.users:
     print(user.user.data.PersonaName)
 
 for shortcut in steam.library.shortcuts():
-    print(shortcut.appname)
+    print(shortcut.name)
 ```
+
+If Steam is not installed at the given path, calls that read Steam data raise `steam_client.SteamNotFoundError`.
 
 ## Platform Notes
 
-| Platform | Default path                   | Registry helper         |
-|----------|--------------------------------|-------------------------|
-| Windows  | `C:\Program Files (x86)\Steam` | `steam_from_registry()` |
-| Linux    | `~/.local/share/steam`         | Not available           |
+| Platform | Path                                             | Registry helper         |
+|----------|--------------------------------------------------|-------------------------|
+| Windows  | `C:\Program Files (x86)\Steam` (default)         | `steam_from_registry()` |
+| Linux    | Pass yours, e.g. `~/.local/share/Steam`          | Not available           |
 
 Pass a custom path to override the default:
 

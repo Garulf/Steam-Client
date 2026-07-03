@@ -1,49 +1,47 @@
+from __future__ import annotations
 from pathlib import Path
-import webbrowser
 
 from .library import Library
-from .login_users import LoginUsers
+from .login_users import LoginUser, LoginUsers
 
 WIN_STEAM_PATH = r"c:\Program Files (x86)\Steam"
-LINUX_STEAM_PATH = "~/.local/share/steam"
 
 
 class Steam:
     """Represents the Steam client."""
 
-    def __init__(self, base_path: str = WIN_STEAM_PATH):
-        self.base_path: str = base_path
+    def __init__(self, base_path: str | Path = WIN_STEAM_PATH):
+        self.base_path = Path(base_path)
 
     def __repr__(self) -> str:
-        return f'Steam(base_path={self.base_path.__repr__()})'
+        return f'Steam(base_path={str(self.base_path)!r})'
 
     @property
     def app_cache(self) -> Path:
         """Returns the path to the appcache folder."""
-        return Path(self.base_path).joinpath('appcache')
+        return self.base_path / 'appcache'
 
     @property
     def user_data(self) -> Path:
         """Returns the path to the userdata folder."""
-        return Path(self.base_path).joinpath('userdata')
+        return self.base_path / 'userdata'
 
     @property
-    def library_folders(self) -> Path:
+    def library_folders_file(self) -> Path:
         """Returns the path to the libraryfolders.vdf file."""
-        return Path(self.base_path).joinpath('config', 'libraryfolders.vdf')
+        return self.base_path / 'config' / 'libraryfolders.vdf'
 
     @property
     def library_cache(self) -> Path:
         """Returns the path to the librarycache folder."""
-        return Path(self.base_path).joinpath('appcache', 'librarycache')
+        return self.app_cache / 'librarycache'
 
     @property
-    def users(self):
+    def users(self) -> list[LoginUser]:
+        """Returns the current and previously logged in Steam users."""
         return LoginUsers(self.base_path).users()
 
     @property
     def library(self) -> Library:
+        """Returns the Steam library."""
         return Library(self)
-
-    def command(self, uri: str):
-        return webbrowser.open(uri)

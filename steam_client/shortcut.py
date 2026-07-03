@@ -1,7 +1,7 @@
 from __future__ import annotations
+from functools import cached_property
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
 
 import pycrc.algorithms as crc  # type: ignore
 
@@ -17,7 +17,7 @@ CRC_XOR_IN = 0xFFFFFFFF
 CRC_XOR_OUT = 0xFFFFFFFF
 SHORTCUT_TOP_BIT = 0x80000000
 SHORTCUT_TAIL = 0x02000000
-SHORT_ID_SHIFT = 32
+TOP32_SHIFT = 32
 
 CRC32_ALGORITHM = crc.Crc(
     width=CRC_WIDTH,
@@ -36,7 +36,7 @@ class ShortcutEntry(TypedDict):
     StartDir: str
     LaunchOptions: str
     icon: str
-    tags: Dict[str, str]
+    tags: dict[str, str]
 
 
 class Shortcut(App):
@@ -45,44 +45,50 @@ class Shortcut(App):
     def __init__(self, user: LoginUser, data: ShortcutEntry):
         self._data = data
         self._user = user
-        super().__init__()
 
     def __repr__(self) -> str:
-        return f'Shortcut(data={self._data.__repr__()})'
+        return f'Shortcut(data={self._data!r})'
 
     @property
     def name(self) -> str:
+        """Returns the shortcut's name."""
         return self._data["appname"]
 
-    @property
+    @cached_property
     def appid(self) -> str:
+        """Returns the shortcut's generated 64-bit app ID."""
         input_string = self._data["exe"] + self._data["appname"]
         top_32 = CRC32_ALGORITHM.bit_by_bit(input_string) | SHORTCUT_TOP_BIT
-        full_64 = (top_32 << SHORT_ID_SHIFT) | SHORTCUT_TAIL
+        full_64 = (top_32 << TOP32_SHIFT) | SHORTCUT_TAIL
         return str(full_64)
 
+    @property
     def _short_id(self) -> str:
         """
-        Return Steam shortened App ID.
+        Returns the Steam shortened App ID.
         This is primarily used for shortcuts in the grid.
         """
-        return str(int(self.appid) >> SHORT_ID_SHIFT)
+        return str(int(self.appid) >> TOP32_SHIFT)
 
     @property
     def icon(self) -> Path:
+        """Returns the path to the icon image."""
         icon_path = self._data["icon"]
         if icon_path and Path(icon_path).is_file():
             return Path(icon_path)
-        return self._user.grid_path.joinpath(f"{self._short_id()}_icon.png")
+        return self._user.grid_path / f"{self._short_id}_icon.png"
 
     @property
     def header(self) -> Path:
-        return self._user.grid_path.joinpath(f"{self._short_id()}.png")
+        """Returns the path to the header image."""
+        return self._user.grid_path / f"{self._short_id}.png"
 
     @property
     def grid(self) -> Path:
-        return self._user.grid_path.joinpath(f"{self._short_id()}p.png")
+        """Returns the path to the grid image."""
+        return self._user.grid_path / f"{self._short_id}p.png"
 
     @property
     def hero(self) -> Path:
-        return self._user.grid_path.joinpath(f"{self._short_id()}_hero.png")
+        """Returns the path to the hero image."""
+        return self._user.grid_path / f"{self._short_id}_hero.png"

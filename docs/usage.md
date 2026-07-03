@@ -27,11 +27,11 @@ if game:
 ## Use Steam URI commands
 
 ```python
-from steam_client.commands import Commands, SteamWindows
+from steam_client import commands
+from steam_client.commands import SteamWindow
 
-commands = Commands()
 commands.run_game_id("440")
-commands.open(SteamWindows.FRIENDS)
+commands.open_window(SteamWindow.FRIENDS)
 ```
 
 ## Read users and shortcuts
@@ -41,5 +41,5 @@ for user in steam.users:
     print(user.user.data.PersonaName)
 
 for shortcut in steam.library.shortcuts():
-    print(shortcut.appname)
+    print(shortcut.name)
 ```

@@ -12,7 +12,7 @@ pip install steam-client
 from steam_client.steam import Steam
 
 steam = Steam()
-print(steam.library_folders)
+print(steam.library_folders_file)
 ```
 
 On Windows, you can use registry discovery:

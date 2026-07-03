@@ -3,11 +3,10 @@ import sys
 
 from .steam import Steam
 
-
 STEAM_SUB_KEY = r'SOFTWARE\WOW6432Node\Valve\Steam'
 
 
-def get_steam_from_registry() -> str:
+def steam_install_path_from_registry() -> str:
     """Returns the Steam install path from the Windows registry."""
     if sys.platform != "win32":
         raise OSError("Windows registry is only available on Windows")
@@ -18,5 +17,5 @@ def get_steam_from_registry() -> str:
 
 
 def steam_from_registry() -> Steam:
-    """Returns a Steam instance from the Windows registry."""
-    return Steam(get_steam_from_registry())
+    """Returns a Steam instance located via the Windows registry."""
+    return Steam(steam_install_path_from_registry())

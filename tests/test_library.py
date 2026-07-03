@@ -1,8 +1,11 @@
-from unittest.mock import Mock, patch, MagicMock, PropertyMock
+from contextlib import contextmanager
+from itertools import chain, repeat
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, PropertyMock, patch
 
 import pytest
 
+from steam_client import SteamNotFoundError
 from steam_client.library import Library
 from steam_client.library_folder import LibraryFolder
 from steam_client.game import Game
@@ -30,14 +33,30 @@ def mock_vdf_data():
     }
 
 
+@contextmanager
+def fake_library_folders_file(vdf_data, hashes=("hash1",)):
+    """Fakes libraryfolders.vdf: its parsed content and one hash per libraries() call.
+
+    The last hash repeats for any further calls, like an unchanged file would.
+    """
+    hash_iter = chain(hashes, repeat(hashes[-1]))
+
+    def next_hash(*args, **kwargs):
+        mock = MagicMock()
+        mock.hexdigest.return_value = next(hash_iter)
+        return mock
+
+    with patch("builtins.open", MagicMock()), \
+         patch("steam_client.library.load_vdf", return_value=vdf_data) as mock_load, \
+         patch("hashlib.md5", side_effect=next_hash):
+        yield mock_load
+
+
 class TestLibrary:
     def test_libraries_parses_vdf_on_first_call(self, library, mock_vdf_data):
         """Verify that libraries() parses libraryfolders.vdf on first call."""
-        with patch("builtins.open", MagicMock()):
-            with patch("vdf.load", return_value=mock_vdf_data):
-                with patch("hashlib.md5") as mock_md5:
-                    mock_md5.return_value.hexdigest.return_value = "hash1"
-                    libs = list(library.libraries())
+        with fake_library_folders_file(mock_vdf_data):
+            libs = list(library.libraries())
 
         assert len(libs) == 2
         assert isinstance(libs[0], LibraryFolder)
@@ -46,85 +65,56 @@ class TestLibrary:
 
     def test_libraries_cached_when_hash_unchanged(self, library, mock_vdf_data):
         """Verify that libraries are cached when hash doesn't change."""
-        with patch("builtins.open", MagicMock()):
-            with patch("vdf.load", return_value=mock_vdf_data) as mock_vdf_load:
-                with patch("hashlib.md5") as mock_md5:
-                    mock_md5.return_value.hexdigest.return_value = "hash1"
-                    # First call
-                    list(library.libraries())
-                    # Second call with same hash
-                    list(library.libraries())
+        with fake_library_folders_file(mock_vdf_data, hashes=("hash1", "hash1")) as mock_load:
+            list(library.libraries())
+            list(library.libraries())
 
-        # vdf.load should only be called once
-        assert mock_vdf_load.call_count == 1
+        assert mock_load.call_count == 1
 
     def test_libraries_reparsed_when_hash_changes(self, library, mock_vdf_data):
         """Verify that libraries are reparsed when hash changes."""
-        # Sequence: first _is_updated->hash1, store->hash1, second _is_updated->hash2, store->hash2
-        hashes = ["hash1", "hash1", "hash2", "hash2"]
-        hash_iter = iter(hashes)
+        with fake_library_folders_file(mock_vdf_data, hashes=("hash1", "hash2")) as mock_load:
+            list(library.libraries())
+            list(library.libraries())
 
-        with patch("builtins.open", MagicMock()):
-            with patch("vdf.load", return_value=mock_vdf_data) as mock_vdf_load:
-                with patch("hashlib.md5") as mock_md5:
-                    # Create a callable that returns a new mock with the next hash
-                    def create_hash_mock(*args, **kwargs):
-                        mock = MagicMock()
-                        mock.hexdigest.return_value = next(hash_iter)
-                        return mock
-                    mock_md5.side_effect = create_hash_mock
-                    # First call: detects update (None != hash1), stores hash1
-                    list(library.libraries())
-                    # Second call: detects update (hash1 != hash2), stores hash2 and re-parses
-                    list(library.libraries())
+        assert mock_load.call_count == 2
 
-        # vdf.load should be called twice because hash changed on second call
-        assert mock_vdf_load.call_count == 2
+    def test_libraries_raise_steam_not_found_when_file_missing(self, library):
+        """Verify that libraries() raises SteamNotFoundError when the vdf is missing."""
+        with patch("builtins.open", side_effect=FileNotFoundError):
+            with pytest.raises(SteamNotFoundError):
+                list(library.libraries())
 
-    def test_games_aggregates_across_folders(self, library, mock_vdf_data, steam):
+    def test_games_aggregates_across_folders(self, library, mock_vdf_data):
         """Verify that games() yields games from all library folders."""
-        with patch("builtins.open", MagicMock()):
-            with patch("vdf.load", return_value=mock_vdf_data):
-                with patch("hashlib.md5") as mock_md5:
-                    mock_md5.return_value.hexdigest.return_value = "hash1"
-                    games = list(library.games())
+        with fake_library_folders_file(mock_vdf_data):
+            games = list(library.games())
 
         appids = [game.appid for game in games]
         assert appids == ["440", "570", "730", "271590"]
 
     def test_game_by_id_returns_matching_game(self, library, mock_vdf_data):
         """Verify that game_by_id() returns the game with matching appid."""
-        with patch("builtins.open", MagicMock()):
-            with patch("vdf.load", return_value=mock_vdf_data):
-                with patch("hashlib.md5") as mock_md5:
-                    mock_md5.return_value.hexdigest.return_value = "hash1"
-                    game = library.game_by_id("570")
+        with fake_library_folders_file(mock_vdf_data):
+            game = library.game_by_id("570")
 
         assert game is not None
         assert game.appid == "570"
 
     def test_game_by_id_returns_none_when_not_found(self, library, mock_vdf_data):
         """Verify that game_by_id() returns None when game not found."""
-        with patch("builtins.open", MagicMock()):
-            with patch("vdf.load", return_value=mock_vdf_data):
-                with patch("hashlib.md5") as mock_md5:
-                    mock_md5.return_value.hexdigest.return_value = "hash1"
-                    game = library.game_by_id("999999")
+        with fake_library_folders_file(mock_vdf_data):
+            game = library.game_by_id("999999")
 
         assert game is None
 
-    def test_game_by_name_case_insensitive(self, library, mock_vdf_data, steam):
+    def test_game_by_name_case_insensitive(self, library, mock_vdf_data):
         """Verify that game_by_name() is case-insensitive."""
-        with patch("builtins.open", MagicMock()):
-            with patch("vdf.load", return_value=mock_vdf_data):
-                with patch("hashlib.md5") as mock_md5:
-                    mock_md5.return_value.hexdigest.return_value = "hash1"
-                    with patch.object(
-                        Game, "_get_name_from_manifest", return_value="Portal 2"
-                    ):
-                        game1 = library.game_by_name("PORTAL 2")
-                        game2 = library.game_by_name("portal 2")
-                        game3 = library.game_by_name("Portal 2")
+        with fake_library_folders_file(mock_vdf_data):
+            with patch.object(Game, "name", new_callable=PropertyMock, return_value="Portal 2"):
+                game1 = library.game_by_name("PORTAL 2")
+                game2 = library.game_by_name("portal 2")
+                game3 = library.game_by_name("Portal 2")
 
         assert game1 is not None
         assert game2 is not None
@@ -133,14 +123,9 @@ class TestLibrary:
 
     def test_game_by_name_returns_none_when_not_found(self, library, mock_vdf_data):
         """Verify that game_by_name() returns None when game not found."""
-        with patch("builtins.open", MagicMock()):
-            with patch("vdf.load", return_value=mock_vdf_data):
-                with patch("hashlib.md5") as mock_md5:
-                    mock_md5.return_value.hexdigest.return_value = "hash1"
-                    with patch.object(
-                        Game, "_get_name_from_manifest", return_value="Portal 2"
-                    ):
-                        game = library.game_by_name("Nonexistent Game")
+        with fake_library_folders_file(mock_vdf_data):
+            with patch.object(Game, "name", new_callable=PropertyMock, return_value="Portal 2"):
+                game = library.game_by_name("Nonexistent Game")
 
         assert game is None
 
@@ -156,65 +141,51 @@ class TestLibrary:
         mock_user2 = Mock()
         mock_user2.shortcuts.return_value = [mock_shortcut3]
 
-        mock_users = [mock_user1, mock_user2]
-        with patch.object(type(library._steam), "users", new_callable=PropertyMock) as mock_users_prop:
-            mock_users_prop.return_value = mock_users
+        with patch.object(type(library._steam), "users", new_callable=PropertyMock) as mock_users:
+            mock_users.return_value = [mock_user1, mock_user2]
             shortcuts = list(library.shortcuts())
 
-        assert len(shortcuts) == 3
-        assert mock_shortcut1 in shortcuts
-        assert mock_shortcut2 in shortcuts
-        assert mock_shortcut3 in shortcuts
+        assert shortcuts == [mock_shortcut1, mock_shortcut2, mock_shortcut3]
 
-    def test_all_yields_games_then_shortcuts(self, library, mock_vdf_data):
-        """Verify that all() yields games then shortcuts."""
+    def test_all_apps_yields_games_then_shortcuts(self, library, mock_vdf_data):
+        """Verify that all_apps() yields games then shortcuts."""
         mock_shortcut = Mock()
         mock_user = Mock()
         mock_user.shortcuts.return_value = [mock_shortcut]
-        mock_users = [mock_user]
 
-        with patch.object(type(library._steam), "users", new_callable=PropertyMock) as mock_users_prop:
-            mock_users_prop.return_value = mock_users
-            with patch("builtins.open", MagicMock()):
-                with patch("vdf.load", return_value=mock_vdf_data):
-                    with patch("hashlib.md5") as mock_md5:
-                        mock_md5.return_value.hexdigest.return_value = "hash1"
-                        items = list(library.all())
+        with patch.object(type(library._steam), "users", new_callable=PropertyMock) as mock_users:
+            mock_users.return_value = [mock_user]
+            with fake_library_folders_file(mock_vdf_data):
+                items = list(library.all_apps())
 
         assert len(items) == 5
-        games = [item for item in items if isinstance(item, Game)]
-        shortcuts = [item for item in items if item is mock_shortcut]
-        assert len(games) == 4
-        assert len(shortcuts) == 1
+        assert all(isinstance(item, Game) for item in items[:4])
         assert items[-1] is mock_shortcut
 
 
 class TestLibraryFolder:
-    def test_library_folder_get_games_creates_steam_games(self, steam):
-        """Verify that get_games() creates a list of SteamGame objects."""
+    def test_library_folder_games_creates_steam_games(self, steam):
+        """Verify that games() creates a list of Game objects."""
         appids = ["440", "570", "730"]
         folder = LibraryFolder(Path(steam.library_cache), "/library", appids)
 
-        games = folder.get_games()
+        games = folder.games()
 
         assert len(games) == 3
         assert all(isinstance(game, Game) for game in games)
         assert [game.appid for game in games] == appids
 
-    def test_library_folder_get_games_preserves_order(self, steam):
-        """Verify that get_games() preserves appid order."""
+    def test_library_folder_games_preserves_order(self, steam):
+        """Verify that games() preserves appid order."""
         appids = ["999", "111", "555"]
         folder = LibraryFolder(Path(steam.library_cache), "/library", appids)
 
-        games = folder.get_games()
-        retrieved_appids = [game.appid for game in games]
+        games = folder.games()
 
-        assert retrieved_appids == appids
+        assert [game.appid for game in games] == appids
 
-    def test_library_folder_get_games_empty_list(self, steam):
-        """Verify that get_games() handles empty app list."""
+    def test_library_folder_games_empty_list(self, steam):
+        """Verify that games() handles empty app list."""
         folder = LibraryFolder(Path(steam.library_cache), "/library", [])
 
-        games = folder.get_games()
-
-        assert games == []
+        assert folder.games() == []
