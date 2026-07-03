@@ -1,3 +1,7 @@
 mkdocs
 mkdocs-material
 mkdocstrings[python]
+# Transitive dep security floors
+urllib3>=2.7.0
+idna>=3.15
+pymdown-extensions>=10.21.3
