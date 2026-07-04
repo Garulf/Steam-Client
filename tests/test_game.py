@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -56,81 +56,84 @@ def test_hero_blur(game):
     assert game.hero_blur == LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO_BLUR
 
 
+def fake_entry(name, is_file=True):
+    """Builds a mock os.DirEntry for the game's asset directory."""
+    entry = Mock()
+    entry.name = name
+    entry.path = str(LIBRARY_CACHE_PATH / APPID / name)
+    entry.is_file.return_value = is_file
+    return entry
+
+
+def patch_scandir(entries):
+    """Patches os.scandir in steam_client.game with the given entries."""
+    scandir_cm = MagicMock()
+    scandir_cm.__enter__.return_value = iter(entries)
+    return patch("steam_client.game.os.scandir", return_value=scandir_cm)
+
+
 def test_icon_returns_first_non_asset_file(game):
-    header = Mock(spec=Path)
-    header.name = "header.jpg"
-    header.is_file.return_value = True
+    header = fake_entry("header.jpg")
+    icon = fake_entry("icon_hash.ico")
 
-    icon = Mock(spec=Path)
-    icon.name = "icon_hash.ico"
-    icon.is_file.return_value = True
-
-    with patch.object(Path, "iterdir", return_value=[header, icon]):
-        assert game.icon == icon
+    with patch_scandir([header, icon]):
+        assert game.icon == Path(icon.path)
 
 
 def test_icon_returns_none_when_no_valid_icon(game):
-    header = Mock(spec=Path)
-    header.name = "header.jpg"
-    header.is_file.return_value = True
+    header = fake_entry("header.jpg")
+    logo = fake_entry("logo.png")
 
-    logo = Mock(spec=Path)
-    logo.name = "logo.png"
-    logo.is_file.return_value = True
-
-    with patch.object(Path, "iterdir", return_value=[header, logo]):
+    with patch_scandir([header, logo]):
         assert game.icon is None
 
 
 def test_icon_prefers_sha1_named_jpg(game):
     """Steam names icons after the SHA-1 of the file contents; prefer that over strays."""
-    stray = Mock(spec=Path)
-    stray.name = "leftover.tmp"
-    stray.is_file.return_value = True
+    stray = fake_entry("leftover.tmp")
+    icon = fake_entry("0f3e42a397a4bc4ded83f92cbcd4d0eeeb926a09.jpg")
 
-    icon = Mock(spec=Path)
-    icon.name = "0f3e42a397a4bc4ded83f92cbcd4d0eeeb926a09.jpg"
-    icon.is_file.return_value = True
-
-    with patch.object(Path, "iterdir", return_value=[stray, icon]):
-        assert game.icon == icon
+    with patch_scandir([stray, icon]):
+        assert game.icon == Path(icon.path)
 
 
 def test_icon_falls_back_to_first_non_asset_file(game):
     """Without a SHA-1-named jpg (older layouts), the first non-asset file wins."""
-    header = Mock(spec=Path)
-    header.name = "header.jpg"
-    header.is_file.return_value = True
+    header = fake_entry("header.jpg")
+    icon = fake_entry("game.ico")
 
-    icon = Mock(spec=Path)
-    icon.name = "game.ico"
-    icon.is_file.return_value = True
+    with patch_scandir([header, icon]):
+        assert game.icon == Path(icon.path)
 
-    with patch.object(Path, "iterdir", return_value=[header, icon]):
-        assert game.icon == icon
+
+def test_icon_skips_directories(game):
+    """Non-file entries (subdirectories) are never treated as icons."""
+    subdir = fake_entry("screenshots", is_file=False)
+    icon = fake_entry("game.ico")
+
+    with patch_scandir([subdir, icon]):
+        assert game.icon == Path(icon.path)
 
 
 def test_icon_is_cached(game):
-    icon = Mock(spec=Path)
-    icon.name = "icon_hash.ico"
-    icon.is_file.return_value = True
+    icon = fake_entry("icon_hash.ico")
 
-    with patch.object(Path, "iterdir", return_value=[icon]) as mock_iterdir:
+    with patch_scandir([icon]) as mock_scandir:
         first_icon = game.icon
         second_icon = game.icon
 
-    assert first_icon == icon
-    assert second_icon == icon
-    assert mock_iterdir.call_count == 1
+    assert first_icon == Path(icon.path)
+    assert second_icon == Path(icon.path)
+    assert mock_scandir.call_count == 1
 
 
 def test_icon_missing_asset_directory_is_cached(game):
     """A missing asset dir yields None and is not re-scanned on later access."""
-    with patch.object(Path, "iterdir", side_effect=FileNotFoundError) as mock_iterdir:
+    with patch("steam_client.game.os.scandir", side_effect=FileNotFoundError) as mock_scandir:
         assert game.icon is None
         assert game.icon is None
 
-    assert mock_iterdir.call_count == 1
+    assert mock_scandir.call_count == 1
 
 
 def test_game_name_from_manifest(game):

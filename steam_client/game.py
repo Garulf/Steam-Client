@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import re
 from functools import cached_property
 from pathlib import Path
@@ -56,14 +57,19 @@ class Game(App):
         Prefers a SHA-1-named jpg (Steam's icon naming scheme), falling back
         to the first file that is not a known asset for older layouts.
         """
+        fallback: Path | None = None
         try:
-            files = [asset for asset in self.asset_dir.iterdir() if asset.is_file()]
+            with os.scandir(self.asset_dir) as entries:
+                for entry in entries:
+                    if not entry.is_file():
+                        continue
+                    if ICON_NAME_PATTERN.match(entry.name):
+                        return Path(entry.path)
+                    if fallback is None and entry.name not in ASSETS:
+                        fallback = Path(entry.path)
         except (FileNotFoundError, NotADirectoryError):
             return None
-        sha1_named = next((f for f in files if ICON_NAME_PATTERN.match(f.name)), None)
-        if sha1_named is not None:
-            return sha1_named
-        return next((f for f in files if f.name not in ASSETS), None)
+        return fallback
 
     @property
     def header(self) -> Path:
