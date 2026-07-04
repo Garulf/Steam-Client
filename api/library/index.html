@@ -593,10 +593,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#steam_client.library.Library.all" class="md-nav__link">
+  <a href="#steam_client.library.Library.all_apps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        all
+        all_apps
       
     </span>
   </a>
@@ -644,6 +644,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="LibraryFolder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steam_client.library_folder.LibraryFolder.games" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        games
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -886,10 +903,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#steam_client.library.Library.all" class="md-nav__link">
+  <a href="#steam_client.library.Library.all_apps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        all
+        all_apps
       
     </span>
   </a>
@@ -937,6 +954,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="LibraryFolder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steam_client.library_folder.LibraryFolder.games" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        games
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1012,7 +1046,7 @@
 
 
 <a href="#steam_client.library.Library" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">Library</span><span class="p">(</span><span class="n">steam</span><span class="p">:</span> <span class="s1">&#39;Steam&#39;</span><span class="p">)</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">Library</span><span class="p">(</span><span class="n">steam</span><span class="p">:</span> <span class="n">Steam</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1033,10 +1067,10 @@
                     <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
-<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steam</span><span class="p">:</span> <span class="s1">&#39;Steam&#39;</span><span class="p">):</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steam</span><span class="p">:</span> <span class="n">Steam</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_steam</span> <span class="o">=</span> <span class="n">steam</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_libraries_hash</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_libraries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LibraryFolder</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_libraries_hash</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_libraries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">LibraryFolder</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -1061,29 +1095,39 @@
 
 
 <a href="#steam_client.library.Library.libraries" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">libraries</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">LibraryFolder</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">libraries</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">LibraryFolder</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returns the Steam library folders.</p>
+        <p>Yields the Steam library folders, reparsing the file only when it changes.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/library.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">41</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
-<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">libraries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">LibraryFolder</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the Steam library folders.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_updated</span><span class="p">():</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_libraries_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash_steam_libraries</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_libraries</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">library</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_libraries</span><span class="p">:</span>
-        <span class="k">yield</span> <span class="n">library</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">libraries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">LibraryFolder</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yields the Steam library folders, reparsing the file only when it changes.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">current_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash_library_folders_file</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">SteamNotFoundError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;No Steam library found at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_steam</span><span class="o">.</span><span class="n">base_path</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+    <span class="k">if</span> <span class="n">current_hash</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_libraries_hash</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_libraries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_library_folders</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_libraries_hash</span> <span class="o">=</span> <span class="n">current_hash</span>
+    <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_libraries</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1098,25 +1142,23 @@
 
 
 <a href="#steam_client.library.Library.games" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">games</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Game</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">games</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Game</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returns the games from the Steam library.</p>
+        <p>Yields the games from the Steam library.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/library.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
 <span class="normal">52</span>
-<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">games</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Game</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the games from the Steam library.&quot;&quot;&quot;</span>
+<span class="normal">53</span>
+<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">games</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Game</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yields the games from the Steam library.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">library</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">libraries</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">game</span> <span class="ow">in</span> <span class="n">library</span><span class="o">.</span><span class="n">get_games</span><span class="p">():</span>
-            <span class="k">yield</span> <span class="n">game</span>
+        <span class="k">yield from</span> <span class="n">library</span><span class="o">.</span><span class="n">games</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1131,7 +1173,7 @@
 
 
 <a href="#steam_client.library.Library.game_by_id" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">game_by_id</span><span class="p">(</span><span class="n">appid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Game</span><span class="p">]</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">game_by_id</span><span class="p">(</span><span class="n">appid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Game</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1141,17 +1183,11 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/library.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
-<span class="normal">56</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">56</span>
 <span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">game_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Game</span><span class="p">]:</span>
+<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">game_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Game</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the game with the specified ID.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">game</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">games</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">appid</span> <span class="o">==</span> <span class="n">appid</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">game</span>
-    <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">game</span> <span class="k">for</span> <span class="n">game</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">games</span><span class="p">()</span> <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">appid</span> <span class="o">==</span> <span class="n">appid</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1166,27 +1202,27 @@
 
 
 <a href="#steam_client.library.Library.game_by_name" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">game_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Game</span><span class="p">]</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">game_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Game</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returns the game with the specified name.</p>
+        <p>Returns the game with the specified name (case-insensitive).</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/library.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">62</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">game_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Game</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the game with the specified name.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">game</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">games</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">casefold</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">game</span>
-    <span class="k">return</span> <span class="kc">None</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">game_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Game</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the game with the specified name (case-insensitive).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">game</span> <span class="k">for</span> <span class="n">game</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">games</span><span class="p">()</span> <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">casefold</span><span class="p">()),</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1201,25 +1237,23 @@
 
 
 <a href="#steam_client.library.Library.shortcuts" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">shortcuts</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Shortcut</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">shortcuts</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Shortcut</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returns the Non-Steam shortcuts from the Steam library.</p>
+        <p>Yields the Non-Steam shortcuts from the Steam library.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/library.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shortcuts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Shortcut</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the Non-Steam shortcuts from the Steam library.&quot;&quot;&quot;</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shortcuts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Shortcut</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yields the Non-Steam shortcuts from the Steam library.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steam</span><span class="o">.</span><span class="n">users</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">shortcut</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">shortcuts</span><span class="p">():</span>
-            <span class="k">yield</span> <span class="n">shortcut</span>
+        <span class="k">yield from</span> <span class="n">user</span><span class="o">.</span><span class="n">shortcuts</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1229,32 +1263,28 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="steam_client.library.Library.all" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">all</span>
+<h4 id="steam_client.library.Library.all_apps" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">all_apps</span>
 
 
-<a href="#steam_client.library.Library.all" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Game</span><span class="p">,</span> <span class="n">Shortcut</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<a href="#steam_client.library.Library.all_apps" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">all_apps</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Game</span> <span class="o">|</span> <span class="n">Shortcut</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returns all the games and shortcuts from the Steam library.</p>
+        <p>Yields all the games and shortcuts from the Steam library.</p>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/library.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Game</span><span class="p">,</span> <span class="n">Shortcut</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns all the games and shortcuts from the Steam library.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">game</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">games</span><span class="p">():</span>
-        <span class="k">yield</span> <span class="n">game</span>
-    <span class="k">for</span> <span class="n">shortcut</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortcuts</span><span class="p">():</span>
-        <span class="k">yield</span> <span class="n">shortcut</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">all_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Game</span> <span class="o">|</span> <span class="n">Shortcut</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yields all the games and shortcuts from the Steam library.&quot;&quot;&quot;</span>
+    <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">games</span><span class="p">()</span>
+    <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortcuts</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1325,7 +1355,7 @@
   </span>
 
 <a href="#steam_client.library_folder.LibraryFolder" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">LibraryFolder</span><span class="p">(</span><span class="n">library_cache_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">apps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">LibraryFolder</span><span class="p">(</span><span class="n">library_cache_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">apps</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1354,6 +1384,35 @@
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="steam_client.library_folder.LibraryFolder.games" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">games</span>
+
+
+<a href="#steam_client.library_folder.LibraryFolder.games" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">games</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Game</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returns the games installed in this library folder.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>steam_client/library_folder.py</code></summary>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">games</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Game</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the games installed in this library folder.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">Game</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">library_cache_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">appid</span><span class="p">)</span> <span class="k">for</span> <span class="n">appid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 

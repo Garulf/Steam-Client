@@ -532,10 +532,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#steam_client.steam.Steam.library_folders" class="md-nav__link">
+  <a href="#steam_client.steam.Steam.library_folders_file" class="md-nav__link">
     <span class="md-ellipsis">
       
-        library_folders
+        library_folders_file
       
     </span>
   </a>
@@ -547,6 +547,28 @@
     <span class="md-ellipsis">
       
         library_cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#steam_client.steam.Steam.users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#steam_client.steam.Steam.library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        library
       
     </span>
   </a>
@@ -792,10 +814,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#steam_client.steam.Steam.library_folders" class="md-nav__link">
+  <a href="#steam_client.steam.Steam.library_folders_file" class="md-nav__link">
     <span class="md-ellipsis">
       
-        library_folders
+        library_folders_file
       
     </span>
   </a>
@@ -807,6 +829,28 @@
     <span class="md-ellipsis">
       
         library_cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#steam_client.steam.Steam.users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#steam_client.steam.Steam.library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        library
       
     </span>
   </a>
@@ -891,7 +935,7 @@
 
 
 <a href="#steam_client.steam.Steam" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">Steam</span><span class="p">(</span><span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">WIN_STEAM_PATH</span><span class="p">)</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="nf">Steam</span><span class="p">(</span><span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WIN_STEAM_PATH</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -909,9 +953,9 @@
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>steam_client/steam.py</code></summary>
-                    <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">14</span>
-<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">WIN_STEAM_PATH</span><span class="p">):</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">base_path</span>
+                    <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">13</span>
+<span class="normal">14</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WIN_STEAM_PATH</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">base_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -977,16 +1021,16 @@
 
 
 
-<h4 id="steam_client.steam.Steam.library_folders" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">library_folders</span>
+<h4 id="steam_client.steam.Steam.library_folders_file" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">library_folders_file</span>
 
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-<a href="#steam_client.steam.Steam.library_folders" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="n">library_folders</span><span class="p">:</span> <span class="n">Path</span>
+<a href="#steam_client.steam.Steam.library_folders_file" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">library_folders_file</span><span class="p">:</span> <span class="n">Path</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1016,6 +1060,54 @@
     <div class="doc doc-contents ">
 
         <p>Returns the path to the librarycache folder.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="steam_client.steam.Steam.users" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">users</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#steam_client.steam.Steam.users" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">users</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">LoginUser</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returns the current and previously logged in Steam users.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="steam_client.steam.Steam.library" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">library</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#steam_client.steam.Steam.library" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">library</span><span class="p">:</span> <span class="n">Library</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returns the Steam library.</p>
 
     </div>
 
