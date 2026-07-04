@@ -2,11 +2,7 @@ import webbrowser
 from enum import StrEnum
 
 
-def _create_uri(*segments: str) -> str:
-    return f'steam://{"/".join(segments)}'
-
-
-class SteamWindows(StrEnum):
+class SteamWindow(StrEnum):
     """Enumeration of Steam client windows."""
     MAIN = 'main'
     GAMES = 'games'
@@ -22,36 +18,44 @@ class SteamWindows(StrEnum):
     CONSOLE = 'console'
 
 
-class Commands:
-    """A collection of commands for the Steam client."""
+def _create_uri(*segments: str) -> str:
+    return f'steam://{"/".join(segments)}'
 
-    def _open(self, *segments: str) -> None:
-        webbrowser.open(_create_uri(*segments))
 
-    def run_game_id(self, app_id: str) -> None:
-        """Launches game with the specified ID in the Steam client."""
-        self._open('rungameid', app_id)
+def _open(*segments: str) -> None:
+    webbrowser.open(_create_uri(*segments))
 
-    def store(self, app_id: str) -> None:
-        """Opens the game's store page in the Steam client."""
-        self._open('store', app_id)
 
-    def install(self, app_id: str) -> None:
-        """Opens the game's install prompt in the Steam client."""
-        self._open('install', app_id)
+def run_game_id(app_id: str) -> None:
+    """Launches game with the specified ID in the Steam client."""
+    _open('rungameid', app_id)
 
-    def uninstall(self, app_id: str) -> None:
-        """Opens the game's uninstall prompt in the Steam client."""
-        self._open('uninstall', app_id)
 
-    def update_news(self, app_id: str) -> None:
-        """Opens the game's update news in the Steam client."""
-        self._open('updatenews', app_id)
+def store(app_id: str) -> None:
+    """Opens the game's store page in the Steam client."""
+    _open('store', app_id)
 
-    def open(self, window: SteamWindows) -> None:
-        """Opens the specified window in the Steam client."""
-        self._open('open', window)
 
-    def open_url(self, url: str) -> None:
-        """Opens the specified URL in the Steam client."""
-        self._open('openurl', url)
+def install(app_id: str) -> None:
+    """Opens the game's install prompt in the Steam client."""
+    _open('install', app_id)
+
+
+def uninstall(app_id: str) -> None:
+    """Opens the game's uninstall prompt in the Steam client."""
+    _open('uninstall', app_id)
+
+
+def update_news(app_id: str) -> None:
+    """Opens the game's update news in the Steam client."""
+    _open('updatenews', app_id)
+
+
+def open_window(window: SteamWindow) -> None:
+    """Opens the specified window in the Steam client."""
+    _open('open', window)
+
+
+def open_url(url: str) -> None:
+    """Opens the specified URL in the Steam client."""
+    _open('openurl', url)

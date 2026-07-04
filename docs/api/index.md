@@ -9,4 +9,4 @@ The API is organized into logical groups. Each page is generated directly from t
 | [Games & Apps](games.md) | `Game`, `Shortcut`, and the shared `App` base class |
 | [Commands](commands.md) | Send Steam URI commands to the local client |
 | [Users](users.md) | Read logged-in Steam users |
-| [Utilities](utils.md) | Helper functions (e.g. Windows registry discovery) |
+| [Utilities](utils.md) | Helper functions and exceptions (VDF parsing, Windows registry discovery) |

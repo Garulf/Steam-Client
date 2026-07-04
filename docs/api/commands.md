@@ -1,13 +1,13 @@
 # Commands
 
-`Commands` builds and dispatches `steam://` URI commands to the local Steam client via `webbrowser.open`. `SteamWindows` is a `StrEnum` of all openable Steam windows.
+The `commands` module builds and dispatches `steam://` URI commands to the local Steam client via `webbrowser.open`. `SteamWindow` is a `StrEnum` of all openable Steam windows.
 
 ```python
-from steam_client.commands import Commands, SteamWindows
+from steam_client import commands
+from steam_client.commands import SteamWindow
 
-commands = Commands()
 commands.run_game_id("440")
-commands.open(SteamWindows.FRIENDS)
+commands.open_window(SteamWindow.FRIENDS)
 ```
 
 ::: steam_client.commands

@@ -1,10 +1,12 @@
 from __future__ import annotations
-import functools
+import re
+from functools import cached_property
 from pathlib import Path
+from typing import Any
 
-import vdf  # type: ignore
-
+from . import commands
 from .app import App
+from .vdf_file import load_vdf
 
 
 UNKNOWN_GAME_NAME = 'UNKNOWN'
@@ -23,6 +25,9 @@ ASSETS = frozenset({
     LOGO
 })
 
+# Steam names icons after the SHA-1 hash of the file's own contents.
+ICON_NAME_PATTERN = re.compile(r'^[0-9a-f]{40}\.jpg$')
+
 
 class Game(App):
     """Represents a Steam game."""
@@ -31,82 +36,71 @@ class Game(App):
         self._library_cache_path = Path(library_cache_path)
         self.library_path = library_path
         self._appid = appid
-        self._icon: Path | None = None
-        self._name: str | None = None
-        super().__init__()
 
     def __repr__(self) -> str:
         return (
-            f'Game(library_cache_path={self._library_cache_path.__repr__()}, '
-            f'library_path={self.library_path.__repr__()}, '
-            f'appid={self.appid.__repr__()})'
+            f'Game(library_cache_path={self._library_cache_path!r}, '
+            f'library_path={self.library_path!r}, '
+            f'appid={self.appid!r})'
         )
 
     @property
     def asset_dir(self) -> Path:
         """Returns the path to the game's asset directory."""
-        return self._library_cache_path.joinpath(self.appid)
+        return self._library_cache_path / self.appid
 
-    @property
+    @cached_property
     def icon(self) -> Path | None:
-        """Returns the path to the icon image."""
-        if self._icon is None:
-            try:
-                self._icon = next(
-                    (
-                        asset
-                        for asset in self.asset_dir.iterdir()
-                        if asset.is_file() and asset.name not in ASSETS
-                    ),
-                    None,
-                )
-            except (FileNotFoundError, NotADirectoryError):
-                return None
-        return self._icon
+        """Returns the path to the icon image.
+
+        Prefers a SHA-1-named jpg (Steam's icon naming scheme), falling back
+        to the first file that is not a known asset for older layouts.
+        """
+        try:
+            files = [asset for asset in self.asset_dir.iterdir() if asset.is_file()]
+        except (FileNotFoundError, NotADirectoryError):
+            return None
+        sha1_named = next((f for f in files if ICON_NAME_PATTERN.match(f.name)), None)
+        if sha1_named is not None:
+            return sha1_named
+        return next((f for f in files if f.name not in ASSETS), None)
 
     @property
     def header(self) -> Path:
         """Returns the path to the header image."""
-        return self.asset_dir.joinpath(HEADER)
+        return self.asset_dir / HEADER
 
     @property
     def grid(self) -> Path:
         """Returns the path to the 600x900 grid image."""
-        return self.asset_dir.joinpath(LIBRARY_600X900)
+        return self.asset_dir / LIBRARY_600X900
 
     @property
     def hero(self) -> Path:
         """Returns the path to the hero image."""
-        return self.asset_dir.joinpath(LIBRARY_HERO)
+        return self.asset_dir / LIBRARY_HERO
 
     @property
     def hero_blur(self) -> Path:
         """Returns the path to the blurred hero image."""
-        return self.asset_dir.joinpath(LIBRARY_HERO_BLUR)
+        return self.asset_dir / LIBRARY_HERO_BLUR
 
     @property
     def manifest_path(self) -> Path:
         """Returns the path to the game's appmanifest."""
-        return Path(self.library_path).joinpath('steamapps', f'appmanifest_{self.appid}.acf')
+        return Path(self.library_path) / 'steamapps' / f'appmanifest_{self.appid}.acf'
 
-    @functools.cached_property
-    def _manifest(self) -> dict:
+    @cached_property
+    def _manifest(self) -> dict[str, Any]:
         """Returns the data from the game's appmanifest."""
         try:
-            with open(self.manifest_path, 'r', encoding='utf-8', errors='ignore') as f:
-                manifest = vdf.load(f)
-            return manifest
+            return load_vdf(self.manifest_path)
         except FileNotFoundError:
             return {}
 
-    @property
+    @cached_property
     def name(self) -> str:
         """Returns the name of the game."""
-        if self._name is None:
-            self._name = self._get_name_from_manifest()
-        return self._name
-
-    def _get_name_from_manifest(self) -> str:
         try:
             return self._manifest['AppState']['name']
         except KeyError:
@@ -117,14 +111,14 @@ class Game(App):
         """Returns the app ID."""
         return self._appid
 
-    def open_store_page(self):
+    def open_store_page(self) -> None:
         """Opens the game's store page in the Steam client."""
-        self._commands.store(self.appid)
+        commands.store(self.appid)
 
-    def install(self):
+    def install(self) -> None:
         """Installs the game."""
-        self._commands.install(self.appid)
+        commands.install(self.appid)
 
-    def uninstall(self):
+    def uninstall(self) -> None:
         """Uninstalls the game."""
-        self._commands.uninstall(self.appid)
+        commands.uninstall(self.appid)

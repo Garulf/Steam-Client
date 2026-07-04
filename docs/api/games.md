@@ -27,7 +27,7 @@ Represents a non-Steam game shortcut. App IDs are computed using the same CRC32 
 
 ```python
 for shortcut in steam.library.shortcuts():
-    print(shortcut.appname, shortcut.grid)
+    print(shortcut.name, shortcut.grid)
 ```
 
 ::: steam_client.shortcut

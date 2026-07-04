@@ -1,11 +1,12 @@
 import pytest
 
 from steam_client.steam import Steam
-from steam_client.login_users import LoginUser, User, UserData
+from steam_client.login_users import STEAM64_OFFSET, LoginUser, User, UserData
 from steam_client.shortcut import ShortcutEntry
 
 FAKE_BASE_PATH = "/fake/steam"
-STEAM64_OFFSET = 76561197960265728
+FAKE_ACCOUNT_ID = 12345678
+FAKE_USER_ID = STEAM64_OFFSET + FAKE_ACCOUNT_ID
 
 
 @pytest.fixture
@@ -19,8 +20,6 @@ def user_data():
         AccountName="testuser",
         PersonaName="Test User",
         RememberPassword="1",
-        WantsOfflineMode="0",
-        SkipOfflineModeWarning="0",
         AllowAutoLogin="1",
         MostRecent="1",
         Timestamp="1700000000",
@@ -29,7 +28,7 @@ def user_data():
 
 @pytest.fixture
 def user(user_data):
-    return User(id=STEAM64_OFFSET + 12345678, data=user_data)
+    return User(id=FAKE_USER_ID, data=user_data)
 
 
 @pytest.fixture
