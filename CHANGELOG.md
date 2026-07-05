@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.1](https://github.com/Garulf/Steam-Client/compare/v5.0.0...v5.0.1) (2026-07-05)
+
+
+### Performance Improvements
+
+* scan game icon directory with os.scandir instead of iterdir+stat ([#10](https://github.com/Garulf/Steam-Client/issues/10)) ([d094aa1](https://github.com/Garulf/Steam-Client/commit/d094aa18a00e2fa44f8d75b562f12e02b4c86624))
+
 ## [5.0.0](https://github.com/Garulf/Steam-Client/compare/v4.1.2...v5.0.0) (2026-07-04)
 
 
