@@ -25,17 +25,17 @@ class App(ABC):
 
     @property
     @abstractmethod
-    def header(self) -> Path:
+    def header(self) -> Path | None:
         """Returns the path to the header image."""
 
     @property
     @abstractmethod
-    def grid(self) -> Path:
+    def grid(self) -> Path | None:
         """Returns the path to the grid image."""
 
     @property
     @abstractmethod
-    def hero(self) -> Path:
+    def hero(self) -> Path | None:
         """Returns the path to the hero image."""
 
     def run(self) -> None:
