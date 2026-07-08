@@ -1669,7 +1669,7 @@
   </span>
 
 <a href="#steam_client.app.App.header" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="n">header</span><span class="p">:</span> <span class="n">Path</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">header</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1694,7 +1694,7 @@
   </span>
 
 <a href="#steam_client.app.App.grid" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="n">grid</span><span class="p">:</span> <span class="n">Path</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">grid</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1719,7 +1719,7 @@
   </span>
 
 <a href="#steam_client.app.App.hero" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="n">hero</span><span class="p">:</span> <span class="n">Path</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">hero</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1845,10 +1845,10 @@
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>steam_client/game.py</code></summary>
-                    <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">library_cache_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">library_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">appid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+                    <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">library_cache_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">library_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">appid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_library_cache_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">library_cache_path</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">library_path</span> <span class="o">=</span> <span class="n">library_path</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_appid</span> <span class="o">=</span> <span class="n">appid</span>
@@ -1909,8 +1909,6 @@
     <div class="doc doc-contents ">
 
         <p>Returns the path to the icon image.</p>
-<p>Prefers a SHA-1-named jpg (Steam's icon naming scheme), falling back
-to the first file that is not a known asset for older layouts.</p>
 
     </div>
 
@@ -1925,11 +1923,12 @@ to the first file that is not a known asset for older layouts.</p>
 
 
   <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 <a href="#steam_client.game.Game.header" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="n">header</span><span class="p">:</span> <span class="n">Path</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">header</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1949,11 +1948,12 @@ to the first file that is not a known asset for older layouts.</p>
 
 
   <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 <a href="#steam_client.game.Game.grid" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="n">grid</span><span class="p">:</span> <span class="n">Path</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">grid</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1973,11 +1973,12 @@ to the first file that is not a known asset for older layouts.</p>
 
 
   <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 <a href="#steam_client.game.Game.hero" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="n">hero</span><span class="p">:</span> <span class="n">Path</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">hero</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1997,11 +1998,12 @@ to the first file that is not a known asset for older layouts.</p>
 
 
   <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 <a href="#steam_client.game.Game.hero_blur" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature codehilite"><pre><span></span><code><span class="n">hero_blur</span><span class="p">:</span> <span class="n">Path</span>
+<div class="doc-signature codehilite"><pre><span></span><code><span class="n">hero_blur</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2106,9 +2108,9 @@ to the first file that is not a known asset for older layouts.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/game.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">open_store_page</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">open_store_page</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Opens the game&#39;s store page in the Steam client.&quot;&quot;&quot;</span>
     <span class="n">commands</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">appid</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -2135,9 +2137,9 @@ to the first file that is not a known asset for older layouts.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/game.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Installs the game.&quot;&quot;&quot;</span>
     <span class="n">commands</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">appid</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -2164,9 +2166,9 @@ to the first file that is not a known asset for older layouts.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>steam_client/game.py</code></summary>
-              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">uninstall</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">uninstall</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Uninstalls the game.&quot;&quot;&quot;</span>
     <span class="n">commands</span><span class="o">.</span><span class="n">uninstall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">appid</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
