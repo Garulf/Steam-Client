@@ -1,33 +1,56 @@
 from __future__ import annotations
-import os
-import re
+import hashlib
 from functools import cached_property
 from pathlib import Path
 from typing import Any
 
 from . import commands
 from .app import App
-from .vdf_file import load_vdf
+from .vdf_file import load_binary_vdf, load_vdf
 
 
 UNKNOWN_GAME_NAME = 'UNKNOWN'
 
-HEADER = 'header.jpg'
-LIBRARY_600X900 = 'library_600x900.jpg'
-LIBRARY_HERO = 'library_hero.jpg'
-LIBRARY_HERO_BLUR = 'library_hero_blur.jpg'
-LOGO = 'logo.png'
+# Field keys used by Steam's assetcache.vdf for each cached asset's
+# relative path (which may include a hash-named subdirectory prefix).
+_GRID_FIELD = '0f'
+_HERO_FIELD = '1f'
+_HEADER_FIELD = '3f'
+_ICON_FIELD = '4f'
+_HERO_BLUR_FIELD = '5f'
 
-ASSETS = frozenset({
-    HEADER,
-    LIBRARY_600X900,
-    LIBRARY_HERO,
-    LIBRARY_HERO_BLUR,
-    LOGO
-})
+_asset_manifest_cache: dict[Path, tuple[str, dict[str, dict[str, str]]]] = {}
 
-# Steam names icons after the SHA-1 hash of the file's own contents.
-ICON_NAME_PATTERN = re.compile(r'^[0-9a-f]{40}\.jpg$')
+
+def _hash_file(path: Path) -> str:
+    """Returns the MD5 hash of a file's contents."""
+    with open(path, 'rb') as f:
+        return hashlib.md5(f.read()).hexdigest()
+
+
+def _load_asset_manifest(library_cache_path: Path) -> dict[str, dict[str, str]]:
+    """Parses assetcache.vdf, mapping appid to its asset field paths.
+
+    Steam records the resolved relative path (including any hash-named
+    subdirectory prefix) for each cached asset there, so it's the
+    authoritative source rather than guessing filenames on disk. Reparsed
+    only when the file's contents change.
+    """
+    path = library_cache_path / 'assetcache.vdf'
+    try:
+        current_hash = _hash_file(path)
+    except FileNotFoundError:
+        return {}
+    cached = _asset_manifest_cache.get(library_cache_path)
+    if cached is not None and cached[0] == current_hash:
+        return cached[1]
+    data = load_binary_vdf(path)
+    # The top-level keys are not always formatted the same way, so grab the
+    # first dict value at each level generically rather than by name.
+    root = data[next(iter(data))]
+    apps = next(value for value in root.values() if isinstance(value, dict))
+    _asset_manifest_cache[library_cache_path] = (current_hash, apps)
+    return apps
 
 
 class Game(App):
@@ -50,46 +73,40 @@ class Game(App):
         """Returns the path to the game's asset directory."""
         return self._library_cache_path / self.appid
 
+    def _manifest_asset(self, field: str) -> Path | None:
+        """Returns the path to an asset recorded in assetcache.vdf, if any."""
+        entry = _load_asset_manifest(self._library_cache_path).get(self.appid)
+        if entry is None:
+            return None
+        relative_path = entry.get(field)
+        if relative_path is None:
+            return None
+        return self.asset_dir / relative_path
+
     @cached_property
     def icon(self) -> Path | None:
-        """Returns the path to the icon image.
+        """Returns the path to the icon image."""
+        return self._manifest_asset(_ICON_FIELD)
 
-        Prefers a SHA-1-named jpg (Steam's icon naming scheme), falling back
-        to the first file that is not a known asset for older layouts.
-        """
-        fallback: Path | None = None
-        try:
-            with os.scandir(self.asset_dir) as entries:
-                for entry in entries:
-                    if not entry.is_file():
-                        continue
-                    if ICON_NAME_PATTERN.match(entry.name):
-                        return Path(entry.path)
-                    if fallback is None and entry.name not in ASSETS:
-                        fallback = Path(entry.path)
-        except (FileNotFoundError, NotADirectoryError):
-            return None
-        return fallback
-
-    @property
-    def header(self) -> Path:
+    @cached_property
+    def header(self) -> Path | None:
         """Returns the path to the header image."""
-        return self.asset_dir / HEADER
+        return self._manifest_asset(_HEADER_FIELD)
 
-    @property
-    def grid(self) -> Path:
+    @cached_property
+    def grid(self) -> Path | None:
         """Returns the path to the 600x900 grid image."""
-        return self.asset_dir / LIBRARY_600X900
+        return self._manifest_asset(_GRID_FIELD)
 
-    @property
-    def hero(self) -> Path:
+    @cached_property
+    def hero(self) -> Path | None:
         """Returns the path to the hero image."""
-        return self.asset_dir / LIBRARY_HERO
+        return self._manifest_asset(_HERO_FIELD)
 
-    @property
-    def hero_blur(self) -> Path:
+    @cached_property
+    def hero_blur(self) -> Path | None:
         """Returns the path to the blurred hero image."""
-        return self.asset_dir / LIBRARY_HERO_BLUR
+        return self._manifest_asset(_HERO_BLUR_FIELD)
 
     @property
     def manifest_path(self) -> Path:
