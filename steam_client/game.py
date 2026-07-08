@@ -12,21 +12,39 @@ from .vdf_file import load_vdf
 UNKNOWN_GAME_NAME = 'UNKNOWN'
 
 HEADER = 'header.jpg'
+LIBRARY_HEADER = 'library_header.jpg'
 LIBRARY_600X900 = 'library_600x900.jpg'
 LIBRARY_HERO = 'library_hero.jpg'
 LIBRARY_HERO_BLUR = 'library_hero_blur.jpg'
 LOGO = 'logo.png'
 
-ASSETS = frozenset({
-    HEADER,
-    LIBRARY_600X900,
-    LIBRARY_HERO,
-    LIBRARY_HERO_BLUR,
-    LOGO
-})
-
 # Steam names icons after the SHA-1 hash of the file's own contents.
 ICON_NAME_PATTERN = re.compile(r'^[0-9a-f]{40}\.jpg$')
+
+
+def _find_asset(asset_dir: Path, *names: str) -> Path | None:
+    """Locates an asset by name within the asset directory.
+
+    Steam sometimes nests an asset under its own unpredictable hash-named
+    subdirectory instead of placing it directly in the asset directory, so
+    each immediate subdirectory is checked too.
+    """
+    for name in names:
+        path = asset_dir / name
+        if path.is_file():
+            return path
+    try:
+        entries = list(asset_dir.iterdir())
+    except (FileNotFoundError, NotADirectoryError):
+        return None
+    for entry in entries:
+        if not entry.is_dir():
+            continue
+        for name in names:
+            path = entry / name
+            if path.is_file():
+                return path
+    return None
 
 
 class Game(App):
@@ -53,37 +71,33 @@ class Game(App):
     def icon(self) -> Path | None:
         """Returns the path to the icon image.
 
-        Prefers a SHA-1-named jpg (Steam's icon naming scheme), falling back
-        to the first file that is not a known asset for older layouts.
+        Steam names the icon after the SHA-1 hash of its own contents.
         """
         try:
-            files = [asset for asset in self.asset_dir.iterdir() if asset.is_file()]
+            files = self.asset_dir.iterdir()
         except (FileNotFoundError, NotADirectoryError):
             return None
-        sha1_named = next((f for f in files if ICON_NAME_PATTERN.match(f.name)), None)
-        if sha1_named is not None:
-            return sha1_named
-        return next((f for f in files if f.name not in ASSETS), None)
+        return next((f for f in files if ICON_NAME_PATTERN.match(f.name)), None)
 
-    @property
-    def header(self) -> Path:
+    @cached_property
+    def header(self) -> Path | None:
         """Returns the path to the header image."""
-        return self.asset_dir / HEADER
+        return _find_asset(self.asset_dir, HEADER, LIBRARY_HEADER)
 
-    @property
-    def grid(self) -> Path:
+    @cached_property
+    def grid(self) -> Path | None:
         """Returns the path to the 600x900 grid image."""
-        return self.asset_dir / LIBRARY_600X900
+        return _find_asset(self.asset_dir, LIBRARY_600X900)
 
-    @property
-    def hero(self) -> Path:
+    @cached_property
+    def hero(self) -> Path | None:
         """Returns the path to the hero image."""
-        return self.asset_dir / LIBRARY_HERO
+        return _find_asset(self.asset_dir, LIBRARY_HERO)
 
-    @property
-    def hero_blur(self) -> Path:
+    @cached_property
+    def hero_blur(self) -> Path | None:
         """Returns the path to the blurred hero image."""
-        return self.asset_dir / LIBRARY_HERO_BLUR
+        return _find_asset(self.asset_dir, LIBRARY_HERO_BLUR)
 
     @property
     def manifest_path(self) -> Path:

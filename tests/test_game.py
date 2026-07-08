@@ -7,6 +7,7 @@ from steam_client.game import (
     Game,
     UNKNOWN_GAME_NAME,
     HEADER,
+    LIBRARY_HEADER,
     LIBRARY_600X900,
     LIBRARY_HERO,
     LIBRARY_HERO_BLUR,
@@ -20,6 +21,39 @@ LIBRARY_CACHE_PATH = Path("/fake/steam/appcache/librarycache")
 @pytest.fixture
 def game():
     return Game(LIBRARY_CACHE_PATH, LIBRARY_PATH, APPID)
+
+
+def is_file_for(*existing_paths):
+    """Returns a Path.is_file replacement that is True only for the given paths."""
+    existing = {str(p) for p in existing_paths}
+
+    def _is_file(self):
+        return str(self) in existing
+
+    return _is_file
+
+
+def is_dir_for(*existing_dirs):
+    """Returns a Path.is_dir replacement that is True only for the given paths."""
+    existing = {str(p) for p in existing_dirs}
+
+    def _is_dir(self):
+        return str(self) in existing
+
+    return _is_dir
+
+
+def dir_listing(mapping):
+    """Returns a Path.iterdir replacement, mapping a directory Path to its child Paths."""
+    listing = {str(k): v for k, v in mapping.items()}
+
+    def _iterdir(self):
+        key = str(self)
+        if key not in listing:
+            raise FileNotFoundError(key)
+        return iter(listing[key])
+
+    return _iterdir
 
 
 def test_game_appid(game):
@@ -40,80 +74,114 @@ def test_asset_dir(game):
     assert game.asset_dir == LIBRARY_CACHE_PATH / APPID
 
 
-def test_header(game):
-    assert game.header == LIBRARY_CACHE_PATH / APPID / HEADER
+def test_header_returns_direct_path_when_present(game):
+    header_path = LIBRARY_CACHE_PATH / APPID / HEADER
+    with patch.object(Path, "is_file", is_file_for(header_path)):
+        assert game.header == header_path
 
 
-def test_grid(game):
-    assert game.grid == LIBRARY_CACHE_PATH / APPID / LIBRARY_600X900
+def test_header_falls_back_to_library_header_name(game):
+    """Some layouts name the header asset library_header.jpg instead of header.jpg."""
+    library_header_path = LIBRARY_CACHE_PATH / APPID / LIBRARY_HEADER
+    with patch.object(Path, "is_file", is_file_for(library_header_path)):
+        assert game.header == library_header_path
 
 
-def test_hero(game):
-    assert game.hero == LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO
+def test_header_falls_back_to_nested_hash_subdir(game):
+    """Steam sometimes nests an asset under its own unpredictable hash-named
+    subdirectory instead of placing it directly in the asset directory."""
+    asset_dir = LIBRARY_CACHE_PATH / APPID
+    hash_dir = asset_dir / "b91f57c06260776c04648d061aba6e8de494ef59"
+    nested_header = hash_dir / HEADER
+
+    with patch.object(Path, "is_file", is_file_for(nested_header)), \
+            patch.object(Path, "is_dir", is_dir_for(hash_dir)), \
+            patch.object(Path, "iterdir", dir_listing({asset_dir: [hash_dir]})):
+        assert game.header == nested_header
 
 
-def test_hero_blur(game):
-    assert game.hero_blur == LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO_BLUR
+def test_header_returns_none_when_missing(game):
+    asset_dir = LIBRARY_CACHE_PATH / APPID
+    with patch.object(Path, "is_file", is_file_for()), \
+            patch.object(Path, "is_dir", is_dir_for()), \
+            patch.object(Path, "iterdir", dir_listing({asset_dir: []})):
+        assert game.header is None
 
 
-def test_icon_returns_first_non_asset_file(game):
-    header = Mock(spec=Path)
-    header.name = "header.jpg"
-    header.is_file.return_value = True
-
-    icon = Mock(spec=Path)
-    icon.name = "icon_hash.ico"
-    icon.is_file.return_value = True
-
-    with patch.object(Path, "iterdir", return_value=[header, icon]):
-        assert game.icon == icon
+def test_grid_returns_direct_path_when_present(game):
+    grid_path = LIBRARY_CACHE_PATH / APPID / LIBRARY_600X900
+    with patch.object(Path, "is_file", is_file_for(grid_path)):
+        assert game.grid == grid_path
 
 
-def test_icon_returns_none_when_no_valid_icon(game):
-    header = Mock(spec=Path)
-    header.name = "header.jpg"
-    header.is_file.return_value = True
+def test_grid_falls_back_to_nested_hash_subdir(game):
+    asset_dir = LIBRARY_CACHE_PATH / APPID
+    hash_dir = asset_dir / "ac2f074d790656a06ef8305bd54a6f64e9a70082"
+    nested_grid = hash_dir / LIBRARY_600X900
 
-    logo = Mock(spec=Path)
-    logo.name = "logo.png"
-    logo.is_file.return_value = True
+    with patch.object(Path, "is_file", is_file_for(nested_grid)), \
+            patch.object(Path, "is_dir", is_dir_for(hash_dir)), \
+            patch.object(Path, "iterdir", dir_listing({asset_dir: [hash_dir]})):
+        assert game.grid == nested_grid
 
-    with patch.object(Path, "iterdir", return_value=[header, logo]):
-        assert game.icon is None
+
+def test_hero_returns_direct_path_when_present(game):
+    hero_path = LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO
+    with patch.object(Path, "is_file", is_file_for(hero_path)):
+        assert game.hero == hero_path
+
+
+def test_hero_falls_back_to_nested_hash_subdir(game):
+    asset_dir = LIBRARY_CACHE_PATH / APPID
+    hash_dir = asset_dir / "5925343a8312ea07f234d48170963aafae4158bf"
+    nested_hero = hash_dir / LIBRARY_HERO
+
+    with patch.object(Path, "is_file", is_file_for(nested_hero)), \
+            patch.object(Path, "is_dir", is_dir_for(hash_dir)), \
+            patch.object(Path, "iterdir", dir_listing({asset_dir: [hash_dir]})):
+        assert game.hero == nested_hero
+
+
+def test_hero_blur_returns_direct_path_when_present(game):
+    hero_blur_path = LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO_BLUR
+    with patch.object(Path, "is_file", is_file_for(hero_blur_path)):
+        assert game.hero_blur == hero_blur_path
+
+
+def test_hero_blur_falls_back_to_nested_hash_subdir(game):
+    asset_dir = LIBRARY_CACHE_PATH / APPID
+    hash_dir = asset_dir / "5925343a8312ea07f234d48170963aafae4158bf"
+    nested_hero_blur = hash_dir / LIBRARY_HERO_BLUR
+
+    with patch.object(Path, "is_file", is_file_for(nested_hero_blur)), \
+            patch.object(Path, "is_dir", is_dir_for(hash_dir)), \
+            patch.object(Path, "iterdir", dir_listing({asset_dir: [hash_dir]})):
+        assert game.hero_blur == nested_hero_blur
 
 
 def test_icon_prefers_sha1_named_jpg(game):
     """Steam names icons after the SHA-1 of the file contents; prefer that over strays."""
     stray = Mock(spec=Path)
     stray.name = "leftover.tmp"
-    stray.is_file.return_value = True
 
     icon = Mock(spec=Path)
     icon.name = "0f3e42a397a4bc4ded83f92cbcd4d0eeeb926a09.jpg"
-    icon.is_file.return_value = True
 
     with patch.object(Path, "iterdir", return_value=[stray, icon]):
         assert game.icon == icon
 
 
-def test_icon_falls_back_to_first_non_asset_file(game):
-    """Without a SHA-1-named jpg (older layouts), the first non-asset file wins."""
-    header = Mock(spec=Path)
-    header.name = "header.jpg"
-    header.is_file.return_value = True
+def test_icon_returns_none_when_no_sha1_named_file(game):
+    stray = Mock(spec=Path)
+    stray.name = "leftover.tmp"
 
-    icon = Mock(spec=Path)
-    icon.name = "game.ico"
-    icon.is_file.return_value = True
-
-    with patch.object(Path, "iterdir", return_value=[header, icon]):
-        assert game.icon == icon
+    with patch.object(Path, "iterdir", return_value=[stray]):
+        assert game.icon is None
 
 
 def test_icon_is_cached(game):
     icon = Mock(spec=Path)
-    icon.name = "icon_hash.ico"
-    icon.is_file.return_value = True
+    icon.name = "0f3e42a397a4bc4ded83f92cbcd4d0eeeb926a09.jpg"
 
     with patch.object(Path, "iterdir", return_value=[icon]) as mock_iterdir:
         first_icon = game.icon
