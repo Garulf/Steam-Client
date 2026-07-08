@@ -1,16 +1,12 @@
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 
+import steam_client.game as game_module
 from steam_client.game import (
     Game,
     UNKNOWN_GAME_NAME,
-    HEADER,
-    LIBRARY_HEADER,
-    LIBRARY_600X900,
-    LIBRARY_HERO,
-    LIBRARY_HERO_BLUR,
 )
 
 LIBRARY_PATH = "/library"
@@ -23,37 +19,25 @@ def game():
     return Game(LIBRARY_CACHE_PATH, LIBRARY_PATH, APPID)
 
 
-def is_file_for(*existing_paths):
-    """Returns a Path.is_file replacement that is True only for the given paths."""
-    existing = {str(p) for p in existing_paths}
-
-    def _is_file(self):
-        return str(self) in existing
-
-    return _is_file
+@pytest.fixture(autouse=True)
+def clear_asset_manifest_cache():
+    game_module._asset_manifest_cache.clear()
+    yield
+    game_module._asset_manifest_cache.clear()
 
 
-def is_dir_for(*existing_dirs):
-    """Returns a Path.is_dir replacement that is True only for the given paths."""
-    existing = {str(p) for p in existing_dirs}
-
-    def _is_dir(self):
-        return str(self) in existing
-
-    return _is_dir
+def fake_manifest(apps):
+    """Builds a fake assetscache.vdf parse result, shaped like the real one:
+    an unnamed top-level key wrapping cache_version/last_cleanup_time/apps."""
+    return {'': {'cache_version': 2, 'last_cleanup_time': 0, '0': apps}}
 
 
-def dir_listing(mapping):
-    """Returns a Path.iterdir replacement, mapping a directory Path to its child Paths."""
-    listing = {str(k): v for k, v in mapping.items()}
-
-    def _iterdir(self):
-        key = str(self)
-        if key not in listing:
-            raise FileNotFoundError(key)
-        return iter(listing[key])
-
-    return _iterdir
+def patch_manifest(apps, file_hash="hash1"):
+    """Patches the manifest-loading boundary functions with fake data."""
+    return (
+        patch.object(game_module, "_hash_file", return_value=file_hash),
+        patch.object(game_module, "load_binary_vdf", return_value=fake_manifest(apps)),
+    )
 
 
 def test_game_appid(game):
@@ -74,131 +58,106 @@ def test_asset_dir(game):
     assert game.asset_dir == LIBRARY_CACHE_PATH / APPID
 
 
-def test_header_returns_direct_path_when_present(game):
-    header_path = LIBRARY_CACHE_PATH / APPID / HEADER
-    with patch.object(Path, "is_file", is_file_for(header_path)):
-        assert game.header == header_path
+def test_header_returns_path_from_manifest(game):
+    hash_patch, load_patch = patch_manifest({APPID: {'3f': 'header.jpg'}})
+    with hash_patch, load_patch:
+        assert game.header == LIBRARY_CACHE_PATH / APPID / 'header.jpg'
 
 
-def test_header_falls_back_to_library_header_name(game):
-    """Some layouts name the header asset library_header.jpg instead of header.jpg."""
-    library_header_path = LIBRARY_CACHE_PATH / APPID / LIBRARY_HEADER
-    with patch.object(Path, "is_file", is_file_for(library_header_path)):
-        assert game.header == library_header_path
+def test_header_resolves_nested_hash_subdir_path(game):
+    """Steam sometimes nests an asset under its own hash-named subdirectory;
+    assetscache.vdf records that prefix directly in the relative path."""
+    hash_patch, load_patch = patch_manifest(
+        {APPID: {'3f': 'b91f57c06260776c04648d061aba6e8de494ef59/library_header.jpg'}}
+    )
+    with hash_patch, load_patch:
+        assert game.header == (
+            LIBRARY_CACHE_PATH / APPID / 'b91f57c06260776c04648d061aba6e8de494ef59/library_header.jpg'
+        )
 
 
-def test_header_falls_back_to_nested_hash_subdir(game):
-    """Steam sometimes nests an asset under its own unpredictable hash-named
-    subdirectory instead of placing it directly in the asset directory."""
-    asset_dir = LIBRARY_CACHE_PATH / APPID
-    hash_dir = asset_dir / "b91f57c06260776c04648d061aba6e8de494ef59"
-    nested_header = hash_dir / HEADER
-
-    with patch.object(Path, "is_file", is_file_for(nested_header)), \
-            patch.object(Path, "is_dir", is_dir_for(hash_dir)), \
-            patch.object(Path, "iterdir", dir_listing({asset_dir: [hash_dir]})):
-        assert game.header == nested_header
-
-
-def test_header_returns_none_when_missing(game):
-    asset_dir = LIBRARY_CACHE_PATH / APPID
-    with patch.object(Path, "is_file", is_file_for()), \
-            patch.object(Path, "is_dir", is_dir_for()), \
-            patch.object(Path, "iterdir", dir_listing({asset_dir: []})):
+def test_header_returns_none_when_field_missing(game):
+    hash_patch, load_patch = patch_manifest({APPID: {'0f': 'library_600x900.jpg'}})
+    with hash_patch, load_patch:
         assert game.header is None
 
 
-def test_grid_returns_direct_path_when_present(game):
-    grid_path = LIBRARY_CACHE_PATH / APPID / LIBRARY_600X900
-    with patch.object(Path, "is_file", is_file_for(grid_path)):
-        assert game.grid == grid_path
+def test_header_returns_none_when_appid_missing(game):
+    hash_patch, load_patch = patch_manifest({})
+    with hash_patch, load_patch:
+        assert game.header is None
 
 
-def test_grid_falls_back_to_nested_hash_subdir(game):
-    asset_dir = LIBRARY_CACHE_PATH / APPID
-    hash_dir = asset_dir / "ac2f074d790656a06ef8305bd54a6f64e9a70082"
-    nested_grid = hash_dir / LIBRARY_600X900
-
-    with patch.object(Path, "is_file", is_file_for(nested_grid)), \
-            patch.object(Path, "is_dir", is_dir_for(hash_dir)), \
-            patch.object(Path, "iterdir", dir_listing({asset_dir: [hash_dir]})):
-        assert game.grid == nested_grid
+def test_header_returns_none_when_manifest_file_missing(game):
+    with patch.object(game_module, "_hash_file", side_effect=FileNotFoundError):
+        assert game.header is None
 
 
-def test_hero_returns_direct_path_when_present(game):
-    hero_path = LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO
-    with patch.object(Path, "is_file", is_file_for(hero_path)):
-        assert game.hero == hero_path
+def test_grid_returns_path_from_manifest(game):
+    hash_patch, load_patch = patch_manifest({APPID: {'0f': 'library_600x900.jpg'}})
+    with hash_patch, load_patch:
+        assert game.grid == LIBRARY_CACHE_PATH / APPID / 'library_600x900.jpg'
 
 
-def test_hero_falls_back_to_nested_hash_subdir(game):
-    asset_dir = LIBRARY_CACHE_PATH / APPID
-    hash_dir = asset_dir / "5925343a8312ea07f234d48170963aafae4158bf"
-    nested_hero = hash_dir / LIBRARY_HERO
-
-    with patch.object(Path, "is_file", is_file_for(nested_hero)), \
-            patch.object(Path, "is_dir", is_dir_for(hash_dir)), \
-            patch.object(Path, "iterdir", dir_listing({asset_dir: [hash_dir]})):
-        assert game.hero == nested_hero
+def test_hero_returns_path_from_manifest(game):
+    hash_patch, load_patch = patch_manifest({APPID: {'1f': 'library_hero.jpg'}})
+    with hash_patch, load_patch:
+        assert game.hero == LIBRARY_CACHE_PATH / APPID / 'library_hero.jpg'
 
 
-def test_hero_blur_returns_direct_path_when_present(game):
-    hero_blur_path = LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO_BLUR
-    with patch.object(Path, "is_file", is_file_for(hero_blur_path)):
-        assert game.hero_blur == hero_blur_path
+def test_hero_blur_returns_path_from_manifest(game):
+    hash_patch, load_patch = patch_manifest({APPID: {'5f': 'library_hero_blur.jpg'}})
+    with hash_patch, load_patch:
+        assert game.hero_blur == LIBRARY_CACHE_PATH / APPID / 'library_hero_blur.jpg'
 
 
-def test_hero_blur_falls_back_to_nested_hash_subdir(game):
-    asset_dir = LIBRARY_CACHE_PATH / APPID
-    hash_dir = asset_dir / "5925343a8312ea07f234d48170963aafae4158bf"
-    nested_hero_blur = hash_dir / LIBRARY_HERO_BLUR
-
-    with patch.object(Path, "is_file", is_file_for(nested_hero_blur)), \
-            patch.object(Path, "is_dir", is_dir_for(hash_dir)), \
-            patch.object(Path, "iterdir", dir_listing({asset_dir: [hash_dir]})):
-        assert game.hero_blur == nested_hero_blur
+def test_icon_returns_path_from_manifest(game):
+    icon_name = '0f3e42a397a4bc4ded83f92cbcd4d0eeeb926a09.jpg'
+    hash_patch, load_patch = patch_manifest({APPID: {'4f': icon_name}})
+    with hash_patch, load_patch:
+        assert game.icon == LIBRARY_CACHE_PATH / APPID / icon_name
 
 
-def test_icon_prefers_sha1_named_jpg(game):
-    """Steam names icons after the SHA-1 of the file contents; prefer that over strays."""
-    stray = Mock(spec=Path)
-    stray.name = "leftover.tmp"
-
-    icon = Mock(spec=Path)
-    icon.name = "0f3e42a397a4bc4ded83f92cbcd4d0eeeb926a09.jpg"
-
-    with patch.object(Path, "iterdir", return_value=[stray, icon]):
-        assert game.icon == icon
-
-
-def test_icon_returns_none_when_no_sha1_named_file(game):
-    stray = Mock(spec=Path)
-    stray.name = "leftover.tmp"
-
-    with patch.object(Path, "iterdir", return_value=[stray]):
+def test_icon_returns_none_when_no_icon_field(game):
+    hash_patch, load_patch = patch_manifest({APPID: {'3f': 'header.jpg'}})
+    with hash_patch, load_patch:
         assert game.icon is None
 
 
-def test_icon_is_cached(game):
-    icon = Mock(spec=Path)
-    icon.name = "0f3e42a397a4bc4ded83f92cbcd4d0eeeb926a09.jpg"
+def test_manifest_reparsed_only_when_file_changes(game):
+    hash_patch, load_patch = patch_manifest({APPID: {'3f': 'header.jpg'}})
+    with hash_patch, load_patch as mock_load:
+        first = game.header
+        second = game.header
 
-    with patch.object(Path, "iterdir", return_value=[icon]) as mock_iterdir:
-        first_icon = game.icon
-        second_icon = game.icon
+    assert first == second
+    # header is a cached_property, so a single access only calls load once
+    # regardless; verify the manifest cache itself is keyed on the file hash.
+    assert mock_load.call_count == 1
 
-    assert first_icon == icon
-    assert second_icon == icon
-    assert mock_iterdir.call_count == 1
+    other_game = Game(LIBRARY_CACHE_PATH, LIBRARY_PATH, APPID)
+    # Same file hash as before but different (stale) manifest contents: a
+    # cache hit should keep serving the manifest parsed above, not this one.
+    hash_patch2, load_patch2 = patch_manifest(
+        {APPID: {'3f': 'library_header.jpg'}}, file_hash="hash1"
+    )
+    with hash_patch2, load_patch2 as mock_load2:
+        assert other_game.header == LIBRARY_CACHE_PATH / APPID / 'header.jpg'
+        assert mock_load2.call_count == 0
 
 
-def test_icon_missing_asset_directory_is_cached(game):
-    """A missing asset dir yields None and is not re-scanned on later access."""
-    with patch.object(Path, "iterdir", side_effect=FileNotFoundError) as mock_iterdir:
-        assert game.icon is None
-        assert game.icon is None
+def test_manifest_reparsed_when_file_hash_changes(game):
+    hash_patch, load_patch = patch_manifest({APPID: {'3f': 'header.jpg'}}, file_hash="hash1")
+    with hash_patch, load_patch:
+        assert game.header == LIBRARY_CACHE_PATH / APPID / 'header.jpg'
 
-    assert mock_iterdir.call_count == 1
+    other_game = Game(LIBRARY_CACHE_PATH, LIBRARY_PATH, APPID)
+    hash_patch2, load_patch2 = patch_manifest(
+        {APPID: {'3f': 'library_header.jpg'}}, file_hash="hash2"
+    )
+    with hash_patch2, load_patch2 as mock_load2:
+        assert other_game.header == LIBRARY_CACHE_PATH / APPID / 'library_header.jpg'
+        assert mock_load2.call_count == 1
 
 
 def test_game_name_from_manifest(game):
