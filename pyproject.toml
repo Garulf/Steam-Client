@@ -6,7 +6,7 @@ name = "steam-client"
 authors = [
     {name = "William McAllister", email = "dev.garulf@gmail.com"}
 ]
-version = "4.1.2"
+version = "5.0.1"
 description = "Steam client library for Python"
 readme = "README.md"
 requires-python = ">=3.11"
