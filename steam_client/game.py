@@ -11,7 +11,7 @@ from .vdf_file import load_binary_vdf, load_vdf
 
 UNKNOWN_GAME_NAME = 'UNKNOWN'
 
-# Field keys used by Steam's assetscache.vdf for each cached asset's
+# Field keys used by Steam's assetcache.vdf for each cached asset's
 # relative path (which may include a hash-named subdirectory prefix).
 _GRID_FIELD = '0f'
 _HERO_FIELD = '1f'
@@ -29,14 +29,14 @@ def _hash_file(path: Path) -> str:
 
 
 def _load_asset_manifest(library_cache_path: Path) -> dict[str, dict[str, str]]:
-    """Parses assetscache.vdf, mapping appid to its asset field paths.
+    """Parses assetcache.vdf, mapping appid to its asset field paths.
 
     Steam records the resolved relative path (including any hash-named
     subdirectory prefix) for each cached asset there, so it's the
     authoritative source rather than guessing filenames on disk. Reparsed
     only when the file's contents change.
     """
-    path = library_cache_path / 'assetscache.vdf'
+    path = library_cache_path / 'assetcache.vdf'
     try:
         current_hash = _hash_file(path)
     except FileNotFoundError:
@@ -74,7 +74,7 @@ class Game(App):
         return self._library_cache_path / self.appid
 
     def _manifest_asset(self, field: str) -> Path | None:
-        """Returns the path to an asset recorded in assetscache.vdf, if any."""
+        """Returns the path to an asset recorded in assetcache.vdf, if any."""
         entry = _load_asset_manifest(self._library_cache_path).get(self.appid)
         if entry is None:
             return None

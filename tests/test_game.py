@@ -27,7 +27,7 @@ def clear_asset_manifest_cache():
 
 
 def fake_manifest(apps):
-    """Builds a fake assetscache.vdf parse result, shaped like the real one:
+    """Builds a fake assetcache.vdf parse result, shaped like the real one:
     an unnamed top-level key wrapping cache_version/last_cleanup_time/apps."""
     return {'': {'cache_version': 2, 'last_cleanup_time': 0, '0': apps}}
 
@@ -66,7 +66,7 @@ def test_header_returns_path_from_manifest(game):
 
 def test_header_resolves_nested_hash_subdir_path(game):
     """Steam sometimes nests an asset under its own hash-named subdirectory;
-    assetscache.vdf records that prefix directly in the relative path."""
+    assetcache.vdf records that prefix directly in the relative path."""
     hash_patch, load_patch = patch_manifest(
         {APPID: {'3f': 'b91f57c06260776c04648d061aba6e8de494ef59/library_header.jpg'}}
     )
