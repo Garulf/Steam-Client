@@ -56,30 +56,13 @@ def test_hero_blur(game):
     assert game.hero_blur == LIBRARY_CACHE_PATH / APPID / LIBRARY_HERO_BLUR
 
 
-def test_icon_returns_first_non_asset_file(game):
+def test_icon_falls_back_to_icon_jpg_path(game):
     header = Mock(spec=Path)
     header.name = "header.jpg"
     header.is_file.return_value = True
 
-    icon = Mock(spec=Path)
-    icon.name = "icon_hash.ico"
-    icon.is_file.return_value = True
-
-    with patch.object(Path, "iterdir", return_value=[header, icon]):
-        assert game.icon == icon
-
-
-def test_icon_returns_none_when_no_valid_icon(game):
-    header = Mock(spec=Path)
-    header.name = "header.jpg"
-    header.is_file.return_value = True
-
-    logo = Mock(spec=Path)
-    logo.name = "logo.png"
-    logo.is_file.return_value = True
-
-    with patch.object(Path, "iterdir", return_value=[header, logo]):
-        assert game.icon is None
+    with patch.object(Path, "iterdir", return_value=[header]):
+        assert game.icon == game.asset_dir / "icon.jpg"
 
 
 def test_icon_prefers_sha1_named_jpg(game):
@@ -96,23 +79,19 @@ def test_icon_prefers_sha1_named_jpg(game):
         assert game.icon == icon
 
 
-def test_icon_falls_back_to_first_non_asset_file(game):
-    """Without a SHA-1-named jpg (older layouts), the first non-asset file wins."""
-    header = Mock(spec=Path)
-    header.name = "header.jpg"
-    header.is_file.return_value = True
+def test_icon_falls_back_to_icon_jpg_when_no_sha1_named_file(game):
+    """Without a SHA-1-named jpg (older layouts), fall back to the default icon.jpg path."""
+    stray = Mock(spec=Path)
+    stray.name = "game.ico"
+    stray.is_file.return_value = True
 
-    icon = Mock(spec=Path)
-    icon.name = "game.ico"
-    icon.is_file.return_value = True
-
-    with patch.object(Path, "iterdir", return_value=[header, icon]):
-        assert game.icon == icon
+    with patch.object(Path, "iterdir", return_value=[stray]):
+        assert game.icon == game.asset_dir / "icon.jpg"
 
 
 def test_icon_is_cached(game):
     icon = Mock(spec=Path)
-    icon.name = "icon_hash.ico"
+    icon.name = "0f3e42a397a4bc4ded83f92cbcd4d0eeeb926a09.jpg"
     icon.is_file.return_value = True
 
     with patch.object(Path, "iterdir", return_value=[icon]) as mock_iterdir:

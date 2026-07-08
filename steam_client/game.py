@@ -16,14 +16,7 @@ LIBRARY_600X900 = 'library_600x900.jpg'
 LIBRARY_HERO = 'library_hero.jpg'
 LIBRARY_HERO_BLUR = 'library_hero_blur.jpg'
 LOGO = 'logo.png'
-
-ASSETS = frozenset({
-    HEADER,
-    LIBRARY_600X900,
-    LIBRARY_HERO,
-    LIBRARY_HERO_BLUR,
-    LOGO
-})
+ICON = 'icon.jpg'
 
 # Steam names icons after the SHA-1 hash of the file's own contents.
 ICON_NAME_PATTERN = re.compile(r'^[0-9a-f]{40}\.jpg$')
@@ -63,7 +56,7 @@ class Game(App):
         sha1_named = next((f for f in files if ICON_NAME_PATTERN.match(f.name)), None)
         if sha1_named is not None:
             return sha1_named
-        return next((f for f in files if f.name not in ASSETS), None)
+        return self.asset_dir / ICON
 
     @property
     def header(self) -> Path:
