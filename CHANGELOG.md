@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.2](https://github.com/Garulf/Steam-Client/compare/v5.0.1...v5.0.2) (2026-07-08)
+
+
+### Bug Fixes
+
+* resolve game assets from assetcache.vdf ([#13](https://github.com/Garulf/Steam-Client/issues/13)) ([e4c9ef4](https://github.com/Garulf/Steam-Client/commit/e4c9ef49607f58e77f8e4e17e7280f5a8941ac41))
+
 ## [5.0.1](https://github.com/Garulf/Steam-Client/compare/v5.0.0...v5.0.1) (2026-07-05)
 
 
