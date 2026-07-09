@@ -40,8 +40,8 @@ def login_user(steam, user):
 def shortcut_entry() -> ShortcutEntry:
     return {
         "appid": 0,
-        "appname": "Test Game",
-        "exe": "/path/to/game.exe",
+        "AppName": "Test Game",
+        "Exe": "/path/to/game.exe",
         "StartDir": "/path/to",
         "LaunchOptions": "",
         "icon": "/path/to/icon.png",

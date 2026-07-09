@@ -31,8 +31,8 @@ CRC32_ALGORITHM = crc.Crc(
 
 class ShortcutEntry(TypedDict):
     appid: int
-    appname: str
-    exe: str
+    AppName: str
+    Exe: str
     StartDir: str
     LaunchOptions: str
     icon: str
@@ -52,13 +52,13 @@ class Shortcut(App):
     @property
     def name(self) -> str:
         """Returns the shortcut's name."""
-        return self._data["appname"]
+        return self._data["AppName"]
 
     @cached_property
     def appid(self) -> str:
         """Returns the shortcut's generated 64-bit app ID."""
-        input_string = self._data["exe"] + self._data["appname"]
-        top_32 = CRC32_ALGORITHM.bit_by_bit(input_string) | SHORTCUT_TOP_BIT
+        stored_appid = self._data["appid"]
+        top_32 = int(stored_appid) & 0xFFFFFFFF
         full_64 = (top_32 << TOP32_SHIFT) | SHORTCUT_TAIL
         return str(full_64)
 

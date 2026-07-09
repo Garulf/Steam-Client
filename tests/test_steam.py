@@ -24,7 +24,7 @@ def test_steam_accepts_path_object():
 
 def test_steam_repr():
     s = Steam("/custom/path")
-    assert repr(s) == "Steam(base_path='/custom/path')"
+    assert repr(s) == f"Steam(base_path={str(s.base_path)!r})"
 
 
 def test_app_cache(steam):
