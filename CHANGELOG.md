@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.3](https://github.com/Garulf/Steam-Client/compare/v5.0.2...v5.0.3) (2026-07-09)
+
+
+### Bug Fixes
+
+* shortcut id generation ([#15](https://github.com/Garulf/Steam-Client/issues/15)) ([df1e37a](https://github.com/Garulf/Steam-Client/commit/df1e37a22399cf82c0e2a8811148aa82041c4910))
+
 ## [5.0.2](https://github.com/Garulf/Steam-Client/compare/v5.0.1...v5.0.2) (2026-07-08)
 
 
