@@ -31,8 +31,8 @@ CRC32_ALGORITHM = crc.Crc(
 
 class ShortcutEntry(TypedDict):
     appid: int
-    appname: str
-    exe: str
+    AppName: str
+    Exe: str
     StartDir: str
     LaunchOptions: str
     icon: str
