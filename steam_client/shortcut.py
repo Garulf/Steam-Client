@@ -52,7 +52,7 @@ class Shortcut(App):
     @property
     def name(self) -> str:
         """Returns the shortcut's name."""
-        return self._data["appname"]
+        return self._data["AppName"]
 
     @cached_property
     def appid(self) -> str:
