@@ -62,7 +62,6 @@ class Shortcut(App):
         full_64 = (top_32 << TOP32_SHIFT) | SHORTCUT_TAIL
         return str(full_64)
 
-
     @property
     def _short_id(self) -> str:
         """
