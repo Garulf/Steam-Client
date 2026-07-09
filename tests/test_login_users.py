@@ -57,8 +57,8 @@ def test_shortcuts_parses_vdf(login_user):
         "shortcuts": {
             "0": {
                 "appid": 0,
-                "appname": "My Game",
-                "exe": "/path/game.exe",
+                "AppName": "My Game",
+                "Exe": "/path/game.exe",
                 "StartDir": "/path",
                 "LaunchOptions": "",
                 "icon": "",

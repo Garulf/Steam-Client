@@ -1,9 +1,8 @@
-import zlib
 from pathlib import Path
 
 import pytest
 
-from steam_client.shortcut import SHORTCUT_TAIL, SHORTCUT_TOP_BIT, TOP32_SHIFT, Shortcut
+from steam_client.shortcut import SHORTCUT_TAIL, TOP32_SHIFT, Shortcut
 
 
 @pytest.fixture
@@ -19,10 +18,8 @@ def test_shortcut_appid_is_string(shortcut):
     assert isinstance(shortcut.appid, str)
 
 
-def test_shortcut_appid_matches_crc32(shortcut, shortcut_entry):
-    # zlib.crc32 is an independent implementation of the CRC-32 Steam uses.
-    crc = zlib.crc32((shortcut_entry["exe"] + shortcut_entry["appname"]).encode())
-    expected = ((crc | SHORTCUT_TOP_BIT) << TOP32_SHIFT) | SHORTCUT_TAIL
+def test_shortcut_appid_matches_stored_appid(shortcut, shortcut_entry):
+    expected = ((int(shortcut_entry["appid"]) & 0xFFFFFFFF) << TOP32_SHIFT) | SHORTCUT_TAIL
     assert shortcut.appid == str(expected)
 
 
