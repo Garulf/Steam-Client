@@ -18,35 +18,35 @@ class SteamWindow(StrEnum):
     CONSOLE = 'console'
 
 
-def _create_uri(*segments: str) -> str:
-    return f'steam://{"/".join(segments)}'
+def _create_uri(*segments: str | int) -> str:
+    return f'steam://{"/".join(str(segment) for segment in segments)}'
 
 
-def _open(*segments: str) -> None:
+def _open(*segments: str | int) -> None:
     webbrowser.open(_create_uri(*segments))
 
 
-def run_game_id(app_id: str) -> None:
+def run_game_id(app_id: str | int) -> None:
     """Launches game with the specified ID in the Steam client."""
     _open('rungameid', app_id)
 
 
-def store(app_id: str) -> None:
+def store(app_id: str | int) -> None:
     """Opens the game's store page in the Steam client."""
     _open('store', app_id)
 
 
-def install(app_id: str) -> None:
+def install(app_id: str | int) -> None:
     """Opens the game's install prompt in the Steam client."""
     _open('install', app_id)
 
 
-def uninstall(app_id: str) -> None:
+def uninstall(app_id: str | int) -> None:
     """Opens the game's uninstall prompt in the Steam client."""
     _open('uninstall', app_id)
 
 
-def update_news(app_id: str) -> None:
+def update_news(app_id: str | int) -> None:
     """Opens the game's update news in the Steam client."""
     _open('updatenews', app_id)
 

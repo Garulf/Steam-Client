@@ -11,6 +11,9 @@ class TestCreateURI:
     def test_create_uri_multi_path(self):
         assert _create_uri("store", "app", "67890") == "steam://store/app/67890"
 
+    def test_create_uri_int_segment(self):
+        assert _create_uri("rungameid", 12345) == "steam://rungameid/12345"
+
 
 class TestCommands:
     def test_run_game_id(self):
