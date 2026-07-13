@@ -1,5 +1,16 @@
 # Changelog
 
+## [6.0.0](https://github.com/Garulf/Steam-Client/compare/v5.0.3...v6.0.0) (2026-07-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Shortcut() now takes ShortcutData instead of a dict; ShortcutEntry has been removed.
+
+### Features
+
+* model shortcuts.vdf with ShortcutData dataclass ([#17](https://github.com/Garulf/Steam-Client/issues/17)) ([cfcb6cf](https://github.com/Garulf/Steam-Client/commit/cfcb6cfad26c3170621dc718753db2898e00adb7))
+
 ## [5.0.3](https://github.com/Garulf/Steam-Client/compare/v5.0.2...v5.0.3) (2026-07-09)
 
 
