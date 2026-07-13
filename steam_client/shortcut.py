@@ -1,7 +1,7 @@
 from __future__ import annotations
 from functools import cached_property
 from pathlib import Path
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING
 
 import pycrc.algorithms as crc  # type: ignore
 
@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .login_users import LoginUser
 
 from .app import App
+from .shortcuts import ShortcutData
 
 
 CRC_WIDTH = 32
@@ -29,20 +30,10 @@ CRC32_ALGORITHM = crc.Crc(
 )
 
 
-class ShortcutEntry(TypedDict):
-    appid: int
-    AppName: str
-    Exe: str
-    StartDir: str
-    LaunchOptions: str
-    icon: str
-    tags: dict[str, str]
-
-
 class Shortcut(App):
     """Represents a Non-Steam Game shortcut."""
 
-    def __init__(self, user: LoginUser, data: ShortcutEntry):
+    def __init__(self, user: LoginUser, data: ShortcutData):
         self._data = data
         self._user = user
 
@@ -52,13 +43,21 @@ class Shortcut(App):
     @property
     def name(self) -> str:
         """Returns the shortcut's name."""
-        return self._data["AppName"]
+        return self._data.AppName
 
     @cached_property
     def appid(self) -> str:
-        """Returns the shortcut's generated 64-bit app ID."""
-        stored_appid = self._data["appid"]
-        top_32 = int(stored_appid) & 0xFFFFFFFF
+        """
+        Returns the shortcut's 64-bit app ID.
+        Uses the appid stored in shortcuts.vdf (vdf parses it as a signed
+        32-bit int); older files store none, so it is generated from
+        Exe + AppName with the same CRC-32 Steam uses at creation.
+        """
+        if self._data.appid:
+            top_32 = int(self._data.appid) & 0xFFFFFFFF
+        else:
+            input_string = self._data.Exe + self._data.AppName
+            top_32 = CRC32_ALGORITHM.bit_by_bit(input_string) | SHORTCUT_TOP_BIT
         full_64 = (top_32 << TOP32_SHIFT) | SHORTCUT_TAIL
         return str(full_64)
 
@@ -73,10 +72,13 @@ class Shortcut(App):
     @property
     def icon(self) -> Path:
         """Returns the path to the icon image."""
-        icon_path = self._data["icon"]
+        icon_path = self._data.icon
         if icon_path and Path(icon_path).is_file():
             return Path(icon_path)
-        return self._user.grid_path / f"{self._short_id}_icon.png"
+        grid_icon = self._user.grid_path / f"{self._short_id}_icon.png"
+        if grid_icon.is_file():
+            return grid_icon
+        return Path(self._data.Exe.strip('"'))
 
     @property
     def header(self) -> Path:

@@ -5,7 +5,8 @@ from typing import Any
 
 from .exceptions import SteamNotFoundError
 from .shortcut import Shortcut
-from .vdf_file import load_binary_vdf, load_vdf
+from .shortcuts import Shortcuts
+from .vdf_file import load_vdf
 
 STEAM64_OFFSET = 76561197960265728
 
@@ -75,10 +76,10 @@ class LoginUser:
     def shortcuts(self) -> list[Shortcut]:
         """Returns the user's Non-Steam shortcuts; empty if none have been created."""
         try:
-            data = load_binary_vdf(self.shortcuts_file)
+            data = Shortcuts.load(self.shortcuts_file)
         except FileNotFoundError:
             return []
-        return [Shortcut(self, entry) for entry in data['shortcuts'].values()]
+        return [Shortcut(self, entry) for entry in data.shortcuts]
 
 
 class LoginUsers:

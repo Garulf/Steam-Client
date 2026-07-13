@@ -6,6 +6,7 @@ import pytest
 
 from steam_client import SteamNotFoundError
 from steam_client.login_users import LoginUser, LoginUsers, User, UserData
+from steam_client.shortcuts import ShortcutData
 
 from tests.conftest import FAKE_ACCOUNT_ID, FAKE_USER_ID
 
@@ -66,15 +67,16 @@ def test_shortcuts_parses_vdf(login_user):
             }
         }
     }
-    with patch("steam_client.login_users.load_binary_vdf", return_value=fake_shortcut_data):
+    with patch("steam_client.shortcuts.load_binary_vdf", return_value=fake_shortcut_data):
         shortcuts = login_user.shortcuts()
     assert len(shortcuts) == 1
     assert shortcuts[0].name == "My Game"
+    assert isinstance(shortcuts[0]._data, ShortcutData)
 
 
 def test_shortcuts_empty_when_file_missing(login_user):
     """A user who never created a shortcut has no shortcuts.vdf; that is not an error."""
-    with patch("steam_client.login_users.load_binary_vdf", side_effect=FileNotFoundError):
+    with patch("steam_client.shortcuts.load_binary_vdf", side_effect=FileNotFoundError):
         assert login_user.shortcuts() == []
 
 
