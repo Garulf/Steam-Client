@@ -2,7 +2,7 @@ import pytest
 
 from steam_client.steam import Steam
 from steam_client.login_users import STEAM64_OFFSET, LoginUser, User, UserData
-from steam_client.shortcut import ShortcutEntry
+from steam_client.shortcuts import ShortcutData
 
 FAKE_BASE_PATH = "/fake/steam"
 FAKE_ACCOUNT_ID = 12345678
@@ -37,13 +37,12 @@ def login_user(steam, user):
 
 
 @pytest.fixture
-def shortcut_entry() -> ShortcutEntry:
-    return {
-        "appid": 0,
-        "AppName": "Test Game",
-        "Exe": "/path/to/game.exe",
-        "StartDir": "/path/to",
-        "LaunchOptions": "",
-        "icon": "/path/to/icon.png",
-        "tags": {},
-    }
+def shortcut_data() -> ShortcutData:
+    # vdf parses binary int32s as signed, so a real stored appid can be negative.
+    return ShortcutData(
+        appid=-1059188172,
+        AppName="Test Game",
+        Exe="/path/to/game.exe",
+        StartDir="/path/to",
+        icon="/path/to/icon.png",
+    )
